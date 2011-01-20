@@ -31,6 +31,7 @@ package mpicbg.imglib.container.cell;
 
 import mpicbg.imglib.container.DirectAccessContainer;
 import mpicbg.imglib.container.DirectAccessContainerFactory;
+import mpicbg.imglib.container.basictypecontainer.FloatAccess;
 import mpicbg.imglib.container.basictypecontainer.array.BitArray;
 import mpicbg.imglib.container.basictypecontainer.array.ByteArray;
 import mpicbg.imglib.container.basictypecontainer.array.CharArray;
@@ -163,7 +164,7 @@ public class CellContainerFactory extends DirectAccessContainerFactory
 	}
 
 	@Override
-	public <T extends Type<T>> DirectAccessContainer<T, FloatArray> createFloatInstance(int[] dimensions, int entitiesPerPixel)
+	public <T extends Type<T>> DirectAccessContainer<T, ? extends FloatAccess> createFloatInstance(int[] dimensions, int entitiesPerPixel)
 	{
 		dimensions = checkDimensions( dimensions );
 		int[] cellSize = checkCellSize( this.cellSize, dimensions );

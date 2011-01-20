@@ -127,6 +127,9 @@ public class CellLocalizableByDimCursor<T extends Type<T>> extends CellLocalizab
 	{
 		if ( cell == lastCell )
 			return;
+
+		if ( lastCell != -1 )
+			container.releaseCell( lastCell );
 		
 		lastCell = cell;		
 		cellInstance = container.getCell( cell );		
@@ -409,6 +412,8 @@ public class CellLocalizableByDimCursor<T extends Type<T>> extends CellLocalizab
 		cursor.close();
 		if (!isClosed)
 		{
+			if ( lastCell != -1 )
+				container.releaseCell( lastCell );
 			lastCell = -1;
 			isClosed = true;
 		}		

@@ -90,6 +90,9 @@ public class CellLocalizableCursor<T extends Type<T>> extends CellCursor<T> impl
 	{
 		if ( cell == lastCell )
 			return;
+
+		if ( lastCell != -1 )
+			container.releaseCell( lastCell );
 		
 		lastCell = cell;		
 		cellInstance = container.getCell( cell );		

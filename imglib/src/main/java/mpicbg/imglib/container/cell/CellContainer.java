@@ -121,6 +121,8 @@ public class CellContainer<T extends Type<T>, A extends ArrayDataAccess<A>> exte
 		return cursor.getArrayIndex();
 	}
 
+	public void releaseCell( int cellId ) {}	
+
 	// many cursors using the same cursor for getting their position
 	public int getCellIndex( final ArrayLocalizableByDimCursor<FakeType> cursor, final int cellPos, final int dim )
 	{
@@ -235,5 +237,5 @@ public class CellContainer<T extends Type<T>, A extends ArrayDataAccess<A>> exte
 		{
 			return false;
 		}
-	}	
+	}
 }

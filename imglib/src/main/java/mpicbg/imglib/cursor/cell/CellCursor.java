@@ -87,7 +87,10 @@ public class CellCursor<T extends Type<T>> extends CursorImpl<T> implements Curs
 		if ( cell == lastCell )
 			return;
 		
-		lastCell = cell;		
+		if ( lastCell != -1 )
+			container.releaseCell( lastCell );
+
+		lastCell = cell;
 		cellInstance = container.getCell( cell );				
 		cellMaxI = cellInstance.getNumPixels();	
 		
@@ -114,6 +117,8 @@ public class CellCursor<T extends Type<T>> extends CursorImpl<T> implements Curs
 	{ 
 		if (!isClosed)
 		{
+			if ( lastCell != -1 )
+				container.releaseCell( lastCell );
 			lastCell = -1;
 			isClosed = true;
 		}
