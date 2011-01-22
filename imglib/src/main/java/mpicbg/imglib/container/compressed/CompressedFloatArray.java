@@ -60,21 +60,21 @@ public class CompressedFloatArray implements FloatAccess, ArrayDataAccess<Compre
 	{
 		if ( data == null ) {
 			data = new float[ numEntities ];
-		}
-		if ( compressedData != null ) {
-			try {
-				final byte[] bytes = new byte[ numEntities * 4 ];
-				decompresser.reset();
-			    decompresser.setInput( compressedData );
-			    int resultLength = decompresser.inflate( bytes );
-			    assert resultLength == numEntities * 4 : "decompressed length does not match data array size";
-
-				ByteBuffer.wrap( bytes ).asFloatBuffer().get( data );
-			} catch ( java.util.zip.DataFormatException ex ) {
-				throw new RuntimeException( ex );
+			if ( compressedData != null ) {
+				try {
+					final byte[] bytes = new byte[ numEntities * 4 ];
+					decompresser.reset();
+				    decompresser.setInput( compressedData );
+				    int resultLength = decompresser.inflate( bytes );
+				    assert resultLength == numEntities * 4 : "decompressed length does not match data array size";
+	
+					ByteBuffer.wrap( bytes ).asFloatBuffer().get( data );
+				} catch ( java.util.zip.DataFormatException ex ) {
+					throw new RuntimeException( ex );
+				}
 			}
+			modified = false;
 		}
-		modified = false;
 	}
 
 	@Override
