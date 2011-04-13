@@ -211,10 +211,12 @@ public class TestKDTree
 		final Random rnd = new Random(435435435);
 
 		final float[] p = new float[numDimensions];
+		
+		final float size = (max - min);
 
 		for (int i = 0; i < numPoints; ++i) {
 			for (int d = 0; d < numDimensions; ++d)
-				p[d] = rnd.nextFloat() * (max - min) + min;
+				p[d] = rnd.nextFloat() * size + min;
 
 			final SimpleNode t = new SimpleNode(p);
 			points.add(t);
@@ -227,12 +229,16 @@ public class TestKDTree
 		System.out.println("kdtree setup took: " + (kdSetupTime) + " ms.");
 
 		start = System.currentTimeMillis();
+		final ArrayList<SimpleNode> testpoints = new ArrayList<SimpleNode>();
 		for (int i = 0; i < numTests; ++i) {
 			for (int d = 0; d < numDimensions; ++d)
-				p[d] = rnd.nextFloat() * (2*max - 2*min) + 2*min;
+				p[d] = rnd.nextFloat() * 2 * size + min - size / 2;
 
 			final SimpleNode t = new SimpleNode(p);
-
+			testpoints.add(t);
+		}
+		
+		for ( SimpleNode t : testpoints ) {
 			final SimpleNode nnKdtree = kd.findNearestNeighbor(t);
 			final SimpleNode nnExhaustive = findNearestNeighborExhaustive(points, t);
 
@@ -247,36 +253,21 @@ public class TestKDTree
 		System.out.println("comparison (kdtree <-> exhaustive) search took: " + (compareTime) + " ms.");
 
 		start = System.currentTimeMillis();
-		for (int i = 0; i < numTests; ++i) {
-			for (int d = 0; d < numDimensions; ++d)
-				p[d] = rnd.nextFloat() * (2*max - 2*min) + 2*min;
-			final SimpleNode t = new SimpleNode(p);
-			t.getClass();
-		}
-		final long initTime = System.currentTimeMillis() - start;
-
-		start = System.currentTimeMillis();
-		for (int i = 0; i < numTests; ++i) {
-			for (int d = 0; d < numDimensions; ++d)
-				p[d] = rnd.nextFloat() * (2*max - 2*min) + 2*min;
-			final SimpleNode t = new SimpleNode(p);
+		for ( SimpleNode t : testpoints ) {
 			final SimpleNode nnKdtree = kd.findNearestNeighbor(t);
 			nnKdtree.getClass();
 		}
 		final long kdTime = System.currentTimeMillis() - start;
-		System.out.println("kdtree search took: " + (kdTime-initTime) + " ms.");
-		System.out.println("kdtree all together took: " + (kdSetupTime+kdTime-initTime) + " ms.");
+		System.out.println("kdtree search took: " + (kdTime) + " ms.");
+		System.out.println("kdtree all together took: " + (kdSetupTime+kdTime) + " ms.");
 
 		start = System.currentTimeMillis();
-		for (int i = 0; i < numTests; ++i) {
-			for (int d = 0; d < numDimensions; ++d)
-				p[d] = rnd.nextFloat() * (2*max - 2*min) + 2*min;
-			final SimpleNode t = new SimpleNode(p);
+		for ( SimpleNode t : testpoints ) {
 			final SimpleNode nnExhaustive = findNearestNeighborExhaustive(points, t);
 			nnExhaustive.getClass();
 		}
 		final long exhaustiveTime = System.currentTimeMillis() - start;
-		System.out.println("exhaustive search took: " + (exhaustiveTime-initTime) + " ms.");
+		System.out.println("exhaustive search took: " + (exhaustiveTime) + " ms.");
 
 		return true;
 	}
