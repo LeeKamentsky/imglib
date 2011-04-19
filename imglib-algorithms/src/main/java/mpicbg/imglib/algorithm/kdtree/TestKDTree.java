@@ -334,13 +334,13 @@ A:		for (final SimpleNode node : points) {
 
 	public static void main(String[] args) 
 	{
-		if ( testRadiusSearch( 3, 100000, 1000, -100, 100 ) )
+		if ( testRadiusSearch( 3, 2000000, 1, -100, 100 ) )
 			System.out.println("Radius neighbor test (3) successfull\n");
 
-		if (testNNearestNeighbor(3, 3, 100000, 1000, -5, 5))
+		if (testNNearestNeighbor(3, 3, 2000000, 1, -5, 5))
 			System.out.println("N-Nearest neighbor test (3) successfull\n");
 
-		if (testNearestNeighbor(3, 100000, 1000, -5, 5))
+		if (testNearestNeighbor(3, 2000000, 1, -5, 5))
 			System.out.println("Nearest neighbor test successfull\n");
 	}
 }

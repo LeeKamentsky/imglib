@@ -16,14 +16,19 @@
  */
 package mpicbg.imglib.algorithm.kdtree;
 
+import static mpicbg.imglib.util.Partition.partitionSubList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
 import mpicbg.imglib.algorithm.kdtree.node.Leaf;
 import mpicbg.imglib.algorithm.kdtree.node.Node;
 import mpicbg.imglib.algorithm.kdtree.node.NonLeaf;
+import mpicbg.imglib.algorithm.kdtree.node.SimpleNode;
+import mpicbg.imglib.util.KthElement;
 
 public class KDTree<T extends Leaf<T>>
 {
@@ -66,33 +71,119 @@ public class KDTree<T extends Leaf<T>>
 			++i;
 		}
 
-		root = makeNode(leaves, 0);
+//		DummyNode d = new DummyNode();
+//		DummyNode e = new DummyNode();
+//		doSomething( d, e );
+//
+//		DummyNode2 d2 = new DummyNode2();
+//		DummyNode2 e2 = new DummyNode2();
+//		LeafComparator< DummyNode2 > c2 = new LeafComparator< DummyNode2 >( 0 );
+//		if ( c2.compare( d2, e2 ) > 0 )
+//			System.out.println(""); 
+
+		root = makeNode(leaves, 0, leaves.size()-1, 0);
+	}
+	
+//	public void doSomething( DummyNode d, DummyNode e )
+//	{
+//		LeafComparator< DummyNode > c = new LeafComparator< DummyNode >( 0 );
+//		if ( c.compare( d, e ) > 0 )
+//			System.out.println(""); 		
+//	}
+
+	public static < T extends Leaf<T> > int partitionSubList( int i, int j, final List< T > values, final int dim )
+	{
+		final int pivotIndex = j;
+		T pivot = values.get( j-- );
+		final float pivotDim = pivot.get( dim );
+
+		A: while ( true )
+		{
+			// move i forward while < pivot (and not at j)
+			while ( i <= j )
+			{
+				T ti = values.get( i );
+				if ( ti.get( dim ) >= pivotDim )
+					break;
+				++i;
+			}
+			// now [i] is the place where the next value < pivot is to be
+			// inserted
+
+			if ( i > j )
+				break;
+
+			// move j backward while >= pivot (and not at i)
+			while ( true )
+			{
+				T tj = values.get( j );
+				if ( tj.get( dim ) < pivotDim )
+				{
+					// swap [j] with [i]
+					T tmp = values.get( i );
+					values.set( i, values.get( j ) );
+					values.set( j, tmp );
+					++i;
+					--j;
+					break;
+				}
+				else if ( j == i )
+				{
+					break A;
+				}
+				--j;
+			}
+		}
+
+		// we are done. put the pivot element here.
+		// check whether the element at iLastIndex is <
+		if ( i != pivotIndex )
+		{
+			values.set( pivotIndex, values.get( i ) );
+			values.set( i, pivot );
+		}
+		return i;
 	}
 
+	public static < T extends Leaf<T> > void kthElement( int i, int j, final int k, final List< T > values, final int dim )
+	{
+		while ( true )
+		{
+			int pivotpos = partitionSubList( i, j, values, dim );
+			if ( pivotpos > k )
+			{
+				// partition lower half
+				j = pivotpos - 1;
+			}
+			else if ( pivotpos < k )
+			{
+				// partition upper half
+				i = pivotpos + 1;
+			}
+			else
+				return;
+		}
+	}
 
-
-	protected Node<T> makeNode(final List<T> leaves, final int depth) {
-		final int length = leaves.size();
+	protected Node<T> makeNode(final List<T> leaves, final int i, final int j, final int depth) {
+		final int length = (j - i) + 1;
 
 		if (length == 0)
 			return null;
 
 		if (length == 1)
-			return leaves.get(0);
+			return leaves.get( i );
 
 		final int k = (depth % dimension);
-		final float median = median(leaves, k);
+		final int medianpos = i + (j - i) / 2;
+		kthElement( i, j, medianpos, leaves, k );
+//		KthElement.kthElement( i, j, medianpos, leaves, new LeafComparator< T >( k ) );
+		final float median = leaves.get( medianpos ).get( k );
 
-		final List<T> left = new ArrayList<T>();
-		final List<T> right = new ArrayList<T>();
+		return new NonLeaf<T>(median, dimension, makeNode(leaves, i, medianpos, depth + 1), makeNode(leaves, medianpos+1, j, depth + 1));
 
-		for (int i = 0; i < length; i++) {
-			final T leaf = leaves.get(i);
-			if (leaf.get(k) <= median)
-				left.add(leaf);
-			else
-				right.add(leaf);
-		}
+//		final List<T> left = leaves.subList( 0, medianpos+1 );
+//		final List<T> right = leaves.subList( medianpos+1, length );
 
 		/*
 		 * This fails for the following example:
@@ -113,6 +204,7 @@ public class KDTree<T extends Leaf<T>>
 		 * That's why added the check for "leaf.get(k) < median"
 		 */
 
+		/*
 		if (right.size() == 0) {
 			if (allIdentical(left)) {
 				final T result = leaves.get(0);
@@ -135,8 +227,9 @@ public class KDTree<T extends Leaf<T>>
 			}
 
 		}
+		*/
 
-		return new NonLeaf<T>(median, dimension, makeNode(left, depth + 1), makeNode(right, depth + 1));
+//		return new NonLeaf<T>(median, dimension, makeNode(left, depth + 1), makeNode(right, depth + 1));
 	}
 
 	protected boolean allIdentical(final List<T> list) {
@@ -163,6 +256,24 @@ public class KDTree<T extends Leaf<T>>
 		return duplicates.size() > 0;
 	}
 
+	protected static class LeafComparator< T extends Leaf< T > > implements Comparator< T >
+	{
+		final int k;
+
+		public LeafComparator( final int k )
+		{
+			this.k = k;
+		}
+
+		@Override
+		public int compare( T o1, T o2 )
+		{
+			final float d = o1.get(k) - o2.get(k);
+			return ( d < 0 ) ? -1 : ( d > 0 ? 1 : 0);
+		}
+	}
+
+	// TODO: weg damit
 	protected float median(final List<T> leaves, final int k) {
 		float[] list;
 		if (leaves.size() <= medianLength) {
