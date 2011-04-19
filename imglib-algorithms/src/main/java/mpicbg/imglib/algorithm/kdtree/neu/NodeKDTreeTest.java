@@ -27,7 +27,7 @@ public class NodeKDTreeTest
 
 		long start = System.currentTimeMillis();
 		final NodeKDTree< RealPoint > kdTree = new NodeKDTree< RealPoint >(points);
-		NearestNeighborSearch< RealPoint, NodeTreeAccess< RealPoint > > kd = new NearestNeighborSearch< RealPoint, NodeTreeAccess< RealPoint > >( new NodeTreeAccess< RealPoint >( kdTree.getRoot() ) );		
+		NearestNeighborSearch< RealPoint > kd = new NearestNeighborSearch< RealPoint >( kdTree.getRoot() );		
 		final long kdSetupTime = System.currentTimeMillis() - start;
 		System.out.println("kdtree setup took: " + (kdSetupTime) + " ms.");
 
@@ -126,9 +126,9 @@ public class NodeKDTreeTest
 	
 	public static void testNN( NodeKDTree< RealPoint > tree )
 	{
-		NearestNeighborSearch< RealPoint, NodeTreeAccess< RealPoint > > nn = new NearestNeighborSearch< RealPoint, NodeTreeAccess< RealPoint > >( new NodeTreeAccess< RealPoint >( tree.getRoot() ) );
-		NodeTreeAccess< RealPoint > result = nn.find( new RealPoint( new float[] {0,0,0} ) );
-		System.out.println( result.get() );
+//		NearestNeighborSearch< RealPoint, NodeTreeAccess< RealPoint > > nn = new NearestNeighborSearch< RealPoint, NodeTreeAccess< RealPoint > >( new NodeTreeAccess< RealPoint >( tree.getRoot() ) );
+//		NodeTreeAccess< RealPoint > result = nn.find( new RealPoint( new float[] {0,0,0} ) );
+//		System.out.println( result.get() );
 	}
 
 	public static void main( String[] args )

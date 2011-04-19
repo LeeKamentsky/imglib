@@ -3,25 +3,23 @@ package mpicbg.imglib.algorithm.kdtree.neu;
 import mpicbg.imglib.RealLocalizable;
 
 
-public class NearestNeighborSearch< T, K extends KDTreeAccess< T, K > > 
+public class NearestNeighborSearch< T extends RealLocalizable > 
 {
-	K[] treeAccessStack;
+	Node< T > root;
 	
 	final int n;
 	final float[] pos;
 	final float[] tmp;
 
-	K bestPoint;
+	Node< T > bestPoint;
 	float bestDistance;
 	
-	public NearestNeighborSearch( K treeAccess )
+	public NearestNeighborSearch( Node< T > root )
 	{
-		final int stackDepth = 32;
-		treeAccessStack = treeAccess.createArray( stackDepth );
-		bestPoint = treeAccess.copy();
-		n = treeAccess.numDimensions();
+		n = root.numDimensions();
 		pos = new float[n];
-		tmp = new float[n];		
+		tmp = new float[n];
+		this.root = root;
 	}
 	
 	protected static final float squDist( final float[] p1, final float[] p2 )
@@ -35,26 +33,23 @@ public class NearestNeighborSearch< T, K extends KDTreeAccess< T, K > >
 		return sum;
 	}
 	
-	public K find( RealLocalizable p )
+	public Node< T > find( RealLocalizable p )
 	{
 		p.localize( pos );
 		bestDistance = Float.MAX_VALUE;
-		find( 0 );
+		find( root );
 		return bestPoint;
 	}
 	
-	public void find( int depth )
+	public void find( Node< T > current )
 	{
-		K current = treeAccessStack[ depth ];
-		K child = treeAccessStack[ depth + 1 ];
-		
 		// consider the current node
 		current.localize( tmp );
 		final float distance = squDist( pos, tmp );
 		if ( distance < bestDistance )
 		{
 			bestDistance = distance;
-			bestPoint.setToPosition( current );
+			bestPoint = current;
 		}
 		
 		final int splitDim = current.getSplitDimension();
@@ -63,44 +58,13 @@ public class NearestNeighborSearch< T, K extends KDTreeAccess< T, K > >
 		final boolean leftIsNearBranch = axisDiff < 0;
 
 		// search the near branch
-		child.setToPosition( current );
-		if( leftIsNearBranch )
-		{
-			if ( child.hasLeft() )
-			{
-				child.left();
-				find( depth + 1 );
-			}
-		}
-		else
-		{
-			if ( child.hasRight() )
-			{
-				child.right();
-				find( depth + 1 );
-			}
-		}
-		
+		Node< T > nearChild = leftIsNearBranch ? current.left : current.right;
+		Node< T > awayChild = leftIsNearBranch ? current.right : current.left;
+		if ( nearChild != null )
+			find( nearChild );
+
 	    // search the away branch - maybe
-		if ( axisDistance <= bestDistance )
-		{
-			child.setToPosition( current );
-			if( leftIsNearBranch )
-			{
-				if ( child.hasRight() )
-				{
-					child.right();
-					find( depth + 1 );
-				}
-			}
-			else
-			{
-				if ( child.hasLeft() )
-				{
-					child.left();
-					find( depth + 1 );
-				}
-			}
-		}
+		if ( ( axisDistance <= bestDistance ) && ( awayChild != null ) )
+			find( awayChild );
 	}
 }
