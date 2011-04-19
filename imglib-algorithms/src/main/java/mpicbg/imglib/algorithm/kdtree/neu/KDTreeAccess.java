@@ -5,10 +5,6 @@ import mpicbg.imglib.Sampler;
 
 public interface KDTreeAccess< T, K extends KDTreeAccess< T, K > > extends RealLocalizable, Sampler< T >
 {
-	public boolean hasParent();
-
-	public void parent();
-
 	public boolean hasLeft();
 
 	public void left();

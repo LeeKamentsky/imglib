@@ -64,19 +64,6 @@ public final class NodeTreeAccess< T extends RealLocalizable > implements KDTree
 	}
 
 	@Override
-	public boolean hasParent()
-	{
-		return node.parent != null;
-	}
-
-	@Override
-	public void parent()
-	{
-		assert node.parent != null;
-		node = node.parent;
-	}
-
-	@Override
 	public boolean hasLeft()
 	{
 		return node.left != null;
