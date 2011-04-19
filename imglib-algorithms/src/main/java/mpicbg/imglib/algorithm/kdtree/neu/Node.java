@@ -2,15 +2,16 @@ package mpicbg.imglib.algorithm.kdtree.neu;
 
 import mpicbg.imglib.RealLocalizable;
 import mpicbg.imglib.Sampler;
-import mpicbg.imglib.util.Util;
 
 public final class Node< T extends RealLocalizable > implements RealLocalizable, Sampler< T >
 {
+	protected final int n;
+
+	protected final double[] pos;
+
 	protected final T value;
 	
-	protected final int dimension;
-	
-	protected final float coordinate;
+	protected final int splitDimension;
 	
 	protected final Node< T > left;
 	
@@ -18,36 +19,39 @@ public final class Node< T extends RealLocalizable > implements RealLocalizable,
 	
 	public Node( T value, int dimension, final Node< T > left, final Node< T > right ) 
 	{
+		this.n = value.numDimensions();
+		this.pos = new double[n];
+		value.localize( pos );
 		this.value = value;
-		this.dimension = dimension;
-		this.coordinate = value.getFloatPosition( dimension );
+		this.splitDimension = dimension;
 		this.left = left;
 		this.right = right;
 	}
 	
 	protected Node( final Node< T > node ) 
 	{
+		this.n = node.n;
+		this.pos = node.pos.clone();
 		this.value = node.value;
-		this.dimension = node.dimension;
-		this.coordinate = node.coordinate;
+		this.splitDimension = node.splitDimension;
 		this.left = node.left;
 		this.right = node.right;
 	}
 	
 	public int getSplitDimension()
 	{
-		return dimension;
+		return splitDimension;
 	}
 	
-	public float getSplitCoordinate()
+	public double getSplitCoordinate()
 	{
-		return coordinate;
+		return pos[ splitDimension ];
 	}
 
 	@Override
 	public int numDimensions()
 	{
-		return value.numDimensions();
+		return n;
 	}
 
 	@Override
@@ -66,25 +70,27 @@ public final class Node< T extends RealLocalizable > implements RealLocalizable,
 	@Override
 	public void localize( float[] position )
 	{
-		value.localize( position );
+		for ( int d = 0; d < n; ++d )
+			position[ d ] = ( float ) pos[ d ];
 	}
 
 	@Override
 	public void localize( double[] position )
 	{
-		value.localize( position );
+		for ( int d = 0; d < n; ++d )
+			position[ d ] = pos[ d ];
 	}
 
 	@Override
 	public float getFloatPosition( int d )
 	{
-		return value.getFloatPosition( d );
+		return ( float ) pos[ d ];
 	}
 
 	@Override
 	public double getDoublePosition( int d )
 	{
-		return value.getDoublePosition( d );
+		return pos[ d ];
 	}
 
 	@Override
@@ -96,6 +102,26 @@ public final class Node< T extends RealLocalizable > implements RealLocalizable,
 	@Override
 	public String toString()
 	{
-		return "node " + dimension + " ? " + coordinate + " | " + value;
+		return "node " + getSplitDimension() + " ? " + getSplitCoordinate() + " | " + value;
+	}
+	
+	public float squDistanceTo( final float[] p )
+	{
+		float sum = 0;
+		for ( int d = 0; d < n; ++d ) 
+		{
+			sum += ( pos[d] - p[d] ) * ( pos[d] - p[d] ); 
+		}
+		return sum;
+	}
+
+	public double squDistanceTo( final double[] p )
+	{
+		double sum = 0;
+		for ( int d = 0; d < n; ++d ) 
+		{
+			sum += ( pos[d] - p[d] ) * ( pos[d] - p[d] ); 
+		}
+		return sum;
 	}
 }

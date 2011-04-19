@@ -44,19 +44,28 @@ public class NodeKDTree< T extends RealLocalizable > implements EuclideanSpace /
 				return false;
 		return true;
 	}
+
+	public static final class DimComparator< T extends RealLocalizable > implements Comparator< T >
+	{
+		final int d;
+		public DimComparator( int d )
+		{
+			this.d = d;
+		}
+
+		@Override
+		public int compare( T o1, T o2 )
+		{
+			final float diff = o1.getFloatPosition( d ) - o2.getFloatPosition( d );
+			return ( diff < 0 ) ? -1 : ( diff > 0 ? 1 : 0);
+		}		
+	}
 	
 	protected Node< T > makeNode(final List<T> elements, final int i, final int j, final int d )
 	{
 		if ( j > i ) {
 			final int k = i + (j - i) / 2;
-			KthElement.kthElement( i, j, k, elements, new Comparator< T >() {
-				@Override
-				public int compare( T o1, T o2 )
-				{
-					final float diff = o1.getFloatPosition( d ) - o2.getFloatPosition( d );
-					return ( diff < 0 ) ? -1 : ( diff > 0 ? 1 : 0);
-				}		
-			} );
+			KthElement.kthElement( i, j, k, elements, new DimComparator< T >( d ) );
 	
 			final int dChild = ( d + 1 == n ) ? 0 : d + 1;
 			return new Node< T >( elements.get( k ), d, makeNode( elements, i, k - 1, dChild ), makeNode( elements, k + 1, j, dChild ) );

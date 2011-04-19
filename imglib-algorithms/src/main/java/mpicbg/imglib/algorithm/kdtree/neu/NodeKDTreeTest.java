@@ -137,13 +137,9 @@ public class NodeKDTreeTest
 //		System.out.println( tree.toString() );
 //		testNN( tree );
 
+		for (int i = 0; i < 5; ++i ) {
 		if (testNearestNeighbor(3, 100000, 10000, -5, 5))
 			System.out.println("Nearest neighbor test successfull\n");
-		if (testNearestNeighbor(3, 100000, 10000, -5, 5))
-			System.out.println("Nearest neighbor test successfull\n");
-		if (testNearestNeighbor(3, 100000, 10000, -5, 5))
-			System.out.println("Nearest neighbor test successfull\n");
-		if (testNearestNeighbor(3, 100000, 10000, -5, 5))
-			System.out.println("Nearest neighbor test successfull\n");
+		}
 	}
 }
