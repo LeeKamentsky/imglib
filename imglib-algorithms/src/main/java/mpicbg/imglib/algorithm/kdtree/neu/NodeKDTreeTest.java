@@ -7,7 +7,6 @@ import mpicbg.imglib.RealPoint;
 
 public class NodeKDTreeTest
 {
-	
 	protected static boolean testNearestNeighbor( final int numDimensions, final int numPoints, final int numTests, final float min, final float max ) 
 	{
 		final ArrayList< RealPoint > points = new ArrayList< RealPoint >();
@@ -101,42 +100,9 @@ public class NodeKDTreeTest
 
 		return nearest;
 	}
-	
-	
-	
-	
-	
-	
-	public static NodeKDTree< RealPoint > buildNodeKDTree( final int numPoints, final int n )
-	{
-		Random rnd = new Random( 1234 );
-		float[] pos = new float[ n ];
-
-		ArrayList< RealPoint > points = new ArrayList< RealPoint >();
-		for ( int i = 0; i < numPoints; ++i )
-		{
-			for ( int d = 0; d < n; ++d )
-				pos[ d ] = rnd.nextFloat();
-			points.add( new RealPoint( pos ) );
-		}
-		
-		NodeKDTree< RealPoint > tree = new NodeKDTree< RealPoint >( points );
-		return tree;
-	}
-	
-	public static void testNN( NodeKDTree< RealPoint > tree )
-	{
-//		NearestNeighborSearch< RealPoint, NodeTreeAccess< RealPoint > > nn = new NearestNeighborSearch< RealPoint, NodeTreeAccess< RealPoint > >( new NodeTreeAccess< RealPoint >( tree.getRoot() ) );
-//		NodeTreeAccess< RealPoint > result = nn.find( new RealPoint( new float[] {0,0,0} ) );
-//		System.out.println( result.get() );
-	}
 
 	public static void main( String[] args )
 	{
-//		NodeKDTree< RealPoint > tree = buildNodeKDTree( 7, 3 );
-//		System.out.println( tree.toString() );
-//		testNN( tree );
-
 		for (int i = 0; i < 5; ++i ) {
 		if (testNearestNeighbor(3, 100000, 10000, -5, 5))
 			System.out.println("Nearest neighbor test successfull\n");
