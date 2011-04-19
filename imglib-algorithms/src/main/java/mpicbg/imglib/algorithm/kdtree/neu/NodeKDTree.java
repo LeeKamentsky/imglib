@@ -24,32 +24,32 @@ public class NodeKDTree< T extends RealLocalizable > implements EuclideanSpace /
 	 * median needs to be calculated (or estimated, if the length is greater
 	 * than medianLength).
 	 */
-	public NodeKDTree( final List< T > leaves )
+	public NodeKDTree( final List< T > elements )
 	{
-		this.n = leaves.get( 0 ).numDimensions();
+		this.n = elements.get( 0 ).numDimensions();
 
 		// test that dimensionality is preserved
-		assert( verifyDimensions( leaves, n ) );
+		assert( verifyDimensions( elements, n ) );
 
-		if ( leaves instanceof java.util.RandomAccess )
-			root = makeNode( leaves, 0, leaves.size() - 1, 0 );
+		if ( elements instanceof java.util.RandomAccess )
+			root = makeNode( elements, 0, elements.size() - 1, 0 );
 		else
-			root = makeNode( leaves.listIterator(), leaves.listIterator( leaves.size() ), 0 );
+			root = makeNode( elements.listIterator(), elements.listIterator( elements.size() ), 0 );
 	}
 
-	protected static <T extends RealLocalizable > boolean verifyDimensions( final List< T > leaves, final int n )
+	protected static <T extends RealLocalizable > boolean verifyDimensions( final List< T > elements, final int n )
 	{
-		for ( final T leaf : leaves )
-			if ( leaf.numDimensions() != n )
+		for ( final T element : elements )
+			if ( element.numDimensions() != n )
 				return false;
 		return true;
 	}
 	
-	protected Node< T > makeNode(final List<T> leaves, final int i, final int j, final int d )
+	protected Node< T > makeNode(final List<T> elements, final int i, final int j, final int d )
 	{
 		if ( j > i ) {
 			final int k = i + (j - i) / 2;
-			KthElement.kthElement( i, j, k, leaves, new Comparator< T >() {
+			KthElement.kthElement( i, j, k, elements, new Comparator< T >() {
 				@Override
 				public int compare( T o1, T o2 )
 				{
@@ -59,11 +59,11 @@ public class NodeKDTree< T extends RealLocalizable > implements EuclideanSpace /
 			} );
 	
 			final int dChild = ( d + 1 == n ) ? 0 : d + 1;
-			return new Node< T >( leaves.get( k ), d, makeNode( leaves, i, k - 1, dChild ), makeNode( leaves, k + 1, j, dChild ) );
+			return new Node< T >( elements.get( k ), d, makeNode( elements, i, k - 1, dChild ), makeNode( elements, k + 1, j, dChild ) );
 		}
 		else if ( j == i )
 		{
-			return new Node< T >( leaves.get( i ), d, null, null );
+			return new Node< T >( elements.get( i ), d, null, null );
 		}
 		else
 		{
@@ -88,18 +88,18 @@ public class NodeKDTree< T extends RealLocalizable > implements EuclideanSpace /
 		return n;
 	}
 
-//	public String toString( Node< T > node, String indent )
-//	{
-//		if ( node == null )
-//			return indent + "null";
-//		if ( Leaf.class.isInstance( node ) )
-//			return indent + node.toString();
-//		NonLeaf< T > nonLeaf = ( NonLeaf< T > ) node;
-//		return toString( nonLeaf.left, indent + "\t" ) + "\n" + indent + nonLeaf.coordinate + "\n" + toString( nonLeaf.right, indent + "\t" ) + "\n";
-//	}
-//
-//	public String toString()
-//	{
-//		return toString( root, "" );
-//	}
+	public String toString( Node< T > node, String indent )
+	{
+		if ( node == null )
+			return "";
+
+		return indent + "- " + node.toString() + "\n"
+			+ toString( node.left, indent + "  " )
+			+ toString( node.right, indent + "  " );
+	}
+
+	public String toString()
+	{
+		return toString( root, "" );
+	}
 }

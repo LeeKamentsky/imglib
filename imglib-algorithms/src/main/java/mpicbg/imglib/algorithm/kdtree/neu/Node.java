@@ -2,6 +2,7 @@ package mpicbg.imglib.algorithm.kdtree.neu;
 
 import mpicbg.imglib.RealLocalizable;
 import mpicbg.imglib.Sampler;
+import mpicbg.imglib.util.Util;
 
 public final class Node< T extends RealLocalizable > implements RealLocalizable, Sampler< T >
 {
@@ -25,6 +26,22 @@ public final class Node< T extends RealLocalizable > implements RealLocalizable,
 		this.parent = null;
 		this.left = left;
 		this.right = right;
+
+		// TODO: do we need the parent links at all?
+		if( left != null )
+			left.parent = this;
+		if( right != null )
+			right.parent = this;
+	}
+	
+	protected Node( final Node< T > node ) 
+	{
+		this.value = node.value;
+		this.dimension = node.dimension;
+		this.coordinate = node.coordinate;
+		this.parent = node.parent;
+		this.left = node.left;
+		this.right = node.right;
 	}
 	
 	public int getSplitDimension()
@@ -78,5 +95,17 @@ public final class Node< T extends RealLocalizable > implements RealLocalizable,
 	public double getDoublePosition( int d )
 	{
 		return value.getDoublePosition( d );
+	}
+
+	@Override
+	public Node< T > copy()
+	{
+		return new Node< T >( this );
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "node " + dimension + " ? " + coordinate + " | " + value;
 	}
 }

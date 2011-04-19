@@ -14,6 +14,12 @@ public final class NodeTreeAccess< T extends RealLocalizable > implements KDTree
 		n = node.numDimensions();
 	}
 
+	protected NodeTreeAccess( final NodeTreeAccess< T > treeAccess )
+	{
+		this.node = treeAccess.node;
+		this.n = treeAccess.n;
+	}
+
 	@Override
 	public void localize( float[] position )
 	{
@@ -97,9 +103,9 @@ public final class NodeTreeAccess< T extends RealLocalizable > implements KDTree
 	}
 
 	@Override
-	public NodeTreeAccess< T > createPosition()
+	public NodeTreeAccess< T > copy()
 	{
-		return new NodeTreeAccess< T >( node );
+		return new NodeTreeAccess< T >( this );
 	}
 
 	@Override
@@ -113,5 +119,27 @@ public final class NodeTreeAccess< T extends RealLocalizable > implements KDTree
 	public void setToPosition( NodeTreeAccess< T > ref )
 	{
 		this.node = ref.node;
+	}
+
+	@Override
+	public int getSplitDimension()
+	{
+		return node.getSplitDimension();
+	}
+
+	@Override
+	public float getSplitCoordinate()
+	{
+		return node.getSplitCoordinate();
+	}
+
+	@Override
+	public NodeTreeAccess< T >[] createArray( final int size )
+	{
+		@SuppressWarnings( "unchecked" )
+		NodeTreeAccess< T >[] array = new NodeTreeAccess[ size ];
+		for ( int i = 0; i < size; ++i )
+			array[ i ] = copy();
+		return array;
 	}
 }
