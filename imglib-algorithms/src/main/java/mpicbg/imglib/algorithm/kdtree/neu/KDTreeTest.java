@@ -5,7 +5,7 @@ import java.util.Random;
 
 import mpicbg.imglib.RealPoint;
 
-public class NodeKDTreeTest
+public class KDTreeTest
 {
 	protected static boolean testNearestNeighbor( final int numDimensions, final int numPoints, final int numTests, final float min, final float max ) 
 	{
@@ -25,8 +25,8 @@ public class NodeKDTreeTest
 		}
 
 		long start = System.currentTimeMillis();
-		final NodeKDTree< RealPoint > kdTree = new NodeKDTree< RealPoint >(points);
-		NearestNeighborSearch< RealPoint > kd = new NearestNeighborSearch< RealPoint >( kdTree.getRoot() );		
+		final KDTree< RealPoint > kdTree = new KDTree< RealPoint >(points);
+		NearestNeighborSearchOnKDTree< RealPoint > kd = new NearestNeighborSearchOnKDTree< RealPoint >( kdTree );		
 		final long kdSetupTime = System.currentTimeMillis() - start;
 		System.out.println("kdtree setup took: " + (kdSetupTime) + " ms.");
 
@@ -60,7 +60,7 @@ public class NodeKDTreeTest
 
 		start = System.currentTimeMillis();
 		for ( RealPoint t : testpoints ) {
-			final RealPoint nnKdtree = kd.find( t ).get();
+			final RealPoint nnKdtree = kd.search( t ).get();
 			nnKdtree.getClass();
 		}
 		final long kdTime = System.currentTimeMillis() - start;

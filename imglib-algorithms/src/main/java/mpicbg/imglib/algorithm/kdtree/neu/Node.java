@@ -60,13 +60,6 @@ public final class Node< T extends RealLocalizable > implements RealLocalizable,
 		return value;
 	}
 
-	@Deprecated
-	@Override
-	public T getType()
-	{
-		return get();
-	}
-
 	@Override
 	public void localize( float[] position )
 	{

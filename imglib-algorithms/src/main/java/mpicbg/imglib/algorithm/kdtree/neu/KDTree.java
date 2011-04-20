@@ -8,7 +8,7 @@ import mpicbg.imglib.EuclideanSpace;
 import mpicbg.imglib.RealLocalizable;
 import mpicbg.imglib.util.KthElement;
 
-public class NodeKDTree< T extends RealLocalizable > implements EuclideanSpace //TODO: , IterableRealInterval< T >
+public class KDTree< T extends RealLocalizable > implements EuclideanSpace //TODO: , IterableRealInterval< T >
 {
 	/**
 	 * the number of dimensions.
@@ -24,7 +24,7 @@ public class NodeKDTree< T extends RealLocalizable > implements EuclideanSpace /
 	 * median needs to be calculated (or estimated, if the length is greater
 	 * than medianLength).
 	 */
-	public NodeKDTree( final List< T > elements )
+	public KDTree( final List< T > elements )
 	{
 		this.n = elements.get( 0 ).numDimensions();
 

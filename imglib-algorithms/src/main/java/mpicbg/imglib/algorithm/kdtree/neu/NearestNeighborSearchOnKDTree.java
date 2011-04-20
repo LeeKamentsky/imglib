@@ -3,32 +3,32 @@ package mpicbg.imglib.algorithm.kdtree.neu;
 import mpicbg.imglib.RealLocalizable;
 
 
-public class NearestNeighborSearch< T extends RealLocalizable > 
+public class NearestNeighborSearchOnKDTree< T extends RealLocalizable > 
 {
-	Node< T > root;
+	protected KDTree< T > tree;
 	
-	final int n;
-	final double[] pos;
+	protected final int n;
+	protected final double[] pos;
 
-	Node< T > bestPoint;
-	double bestSquDistance;
+	protected Node< T > bestPoint;
+	protected double bestSquDistance;
 	
-	public NearestNeighborSearch( Node< T > root )
+	public NearestNeighborSearchOnKDTree( KDTree< T > tree )
 	{
-		n = root.numDimensions();
+		n = tree.numDimensions();
 		pos = new double[ n ];
-		this.root = root;
+		this.tree = tree;
 	}
 	
-	public Node< T > find( RealLocalizable p )
+	public Node< T > search( RealLocalizable p )
 	{
 		p.localize( pos );
 		bestSquDistance = Double.MAX_VALUE;
-		find( root );
+		searchNode( tree.getRoot() );
 		return bestPoint;
 	}
 	
-	public void find( Node< T > current )
+	protected void searchNode( Node< T > current )
 	{
 		// consider the current node
 		final double distance = current.squDistanceTo( pos );
@@ -43,13 +43,13 @@ public class NearestNeighborSearch< T extends RealLocalizable >
 		final boolean leftIsNearBranch = axisDiff < 0;
 
 		// search the near branch
-		Node< T > nearChild = leftIsNearBranch ? current.left : current.right;
-		Node< T > awayChild = leftIsNearBranch ? current.right : current.left;
+		final Node< T > nearChild = leftIsNearBranch ? current.left : current.right;
+		final Node< T > awayChild = leftIsNearBranch ? current.right : current.left;
 		if ( nearChild != null )
-			find( nearChild );
+			search( nearChild );
 
 	    // search the away branch - maybe
 		if ( ( axisSquDistance <= bestSquDistance ) && ( awayChild != null ) )
-			find( awayChild );
+			search( awayChild );
 	}
 }
