@@ -32,6 +32,7 @@ public class KNearestNeighborSearchOnKDTree< T extends RealLocalizable > impleme
 	@Override
 	public void search( RealLocalizable reference )
 	{
+		reference.localize( pos );
 		for ( int i = 0; i < k; ++i )
 			bestSquDistances[ i ] = Double.MAX_VALUE;
 		searchNode( tree.getRoot() );
@@ -61,11 +62,11 @@ public class KNearestNeighborSearchOnKDTree< T extends RealLocalizable > impleme
 		final Node< T > nearChild = leftIsNearBranch ? current.left : current.right;
 		final Node< T > awayChild = leftIsNearBranch ? current.right : current.left;
 		if ( nearChild != null )
-			search( nearChild );
+			searchNode( nearChild );
 
 	    // search the away branch - maybe
 		if ( ( axisSquDistance <= bestSquDistances[ k - 1 ] ) && ( awayChild != null ) )
-			search( awayChild );
+			searchNode( awayChild );
 	}
 
 	@Override

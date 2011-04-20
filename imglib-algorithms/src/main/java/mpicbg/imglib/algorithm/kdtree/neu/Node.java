@@ -3,7 +3,7 @@ package mpicbg.imglib.algorithm.kdtree.neu;
 import mpicbg.imglib.RealLocalizable;
 import mpicbg.imglib.Sampler;
 
-public final class Node< T extends RealLocalizable > implements RealLocalizable, Sampler< T >
+public final class Node< T > implements RealLocalizable, Sampler< T >
 {
 	protected final int n;
 
@@ -17,11 +17,11 @@ public final class Node< T extends RealLocalizable > implements RealLocalizable,
 	
 	protected final Node< T > right;
 	
-	public Node( T value, int dimension, final Node< T > left, final Node< T > right ) 
+	public Node( T value, RealLocalizable position, int dimension, final Node< T > left, final Node< T > right ) 
 	{
-		this.n = value.numDimensions();
+		this.n = position.numDimensions();
 		this.pos = new double[n];
-		value.localize( pos );
+		position.localize( pos );
 		this.value = value;
 		this.splitDimension = dimension;
 		this.left = left;
@@ -114,6 +114,16 @@ public final class Node< T extends RealLocalizable > implements RealLocalizable,
 		for ( int d = 0; d < n; ++d ) 
 		{
 			sum += ( pos[d] - p[d] ) * ( pos[d] - p[d] ); 
+		}
+		return sum;
+	}
+
+	public double squDistanceTo( final RealLocalizable p )
+	{
+		double sum = 0;
+		for ( int d = 0; d < n; ++d ) 
+		{
+			sum += ( pos[d] - p.getDoublePosition( d ) ) * ( pos[d] - p.getDoublePosition( d ) ); 
 		}
 		return sum;
 	}

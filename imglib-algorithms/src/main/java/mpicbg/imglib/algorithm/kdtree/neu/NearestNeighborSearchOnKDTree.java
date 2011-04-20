@@ -46,10 +46,10 @@ public class NearestNeighborSearchOnKDTree< T extends RealLocalizable >
 		final Node< T > nearChild = leftIsNearBranch ? current.left : current.right;
 		final Node< T > awayChild = leftIsNearBranch ? current.right : current.left;
 		if ( nearChild != null )
-			search( nearChild );
+			searchNode( nearChild );
 
 	    // search the away branch - maybe
 		if ( ( axisSquDistance <= bestSquDistance ) && ( awayChild != null ) )
-			search( awayChild );
+			searchNode( awayChild );
 	}
 }

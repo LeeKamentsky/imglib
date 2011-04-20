@@ -19,10 +19,6 @@ public class KDTree< T extends RealLocalizable > implements EuclideanSpace //TOD
 
 	/**
 	 * Construct a KDTree from the elements in the given list.
-	 * 
-	 * The parameter 'leaves' must be a list and cannot be an iterator, as the
-	 * median needs to be calculated (or estimated, if the length is greater
-	 * than medianLength).
 	 */
 	public KDTree( final List< T > elements )
 	{
@@ -68,11 +64,11 @@ public class KDTree< T extends RealLocalizable > implements EuclideanSpace //TOD
 			KthElement.kthElement( i, j, k, elements, new DimComparator< T >( d ) );
 	
 			final int dChild = ( d + 1 == n ) ? 0 : d + 1;
-			return new Node< T >( elements.get( k ), d, makeNode( elements, i, k - 1, dChild ), makeNode( elements, k + 1, j, dChild ) );
+			return new Node< T >( elements.get( k ), elements.get( k ), d, makeNode( elements, i, k - 1, dChild ), makeNode( elements, k + 1, j, dChild ) );
 		}
 		else if ( j == i )
 		{
-			return new Node< T >( elements.get( i ), d, null, null );
+			return new Node< T >( elements.get( i ), elements.get( i ), d, null, null );
 		}
 		else
 		{
