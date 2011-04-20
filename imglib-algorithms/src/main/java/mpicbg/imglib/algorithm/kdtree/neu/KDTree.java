@@ -26,7 +26,7 @@ public class KDTree< T extends RealLocalizable > implements EuclideanSpace //TOD
 
 		// test that dimensionality is preserved
 		assert( verifyDimensions( elements, n ) );
-
+		
 		if ( elements instanceof java.util.RandomAccess )
 			root = makeNode( elements, 0, elements.size() - 1, 0 );
 		else
@@ -76,10 +76,41 @@ public class KDTree< T extends RealLocalizable > implements EuclideanSpace //TOD
 		}
 	}
 
-	protected Node< T > makeNode( final ListIterator< T > first, final ListIterator< T > last, final int depth )
+	protected Node< T > makeNode( final ListIterator< T > first, final ListIterator< T > last, final int d )
 	{
-		// TODO
-		return null;
+		final int i = first.nextIndex();
+		final int j = last.previousIndex();
+		if ( j > i ) {
+			final int k = i + (j - i) / 2;
+			KthElement.kthElement( first, last, k, new DimComparator< T >( d ) );
+			first.previous();
+			T current = first.next();
+	
+			final int dChild = ( d + 1 == n ) ? 0 : d + 1;
+
+			// Node< T > right = makeNode( elements, k + 1, j, dChild );
+			for ( int c = j - last.previousIndex(); c > 0; --c )
+				last.next();
+			Node< T > right = makeNode( first, last, dChild );
+
+			// Node< T > left = makeNode( elements, i, k - 1, dChild );
+			for ( int c = first.nextIndex() - i; c > 0; --c )
+				first.previous();
+			for ( int c = last.nextIndex() - k; c > 0; --c )
+				last.previous();
+			Node< T > left = makeNode( first, last, dChild );
+
+			return new Node< T >( current, current, d, left, right );
+		}
+		else if ( j == i )
+		{
+			T current = first.next();
+			return new Node< T >( current, current, d, null, null );
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	public Node< T > getRoot()
