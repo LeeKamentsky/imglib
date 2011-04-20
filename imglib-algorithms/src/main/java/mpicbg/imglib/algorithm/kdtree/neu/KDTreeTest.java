@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import mpicbg.imglib.RealPoint;
-import mpicbg.imglib.algorithm.kdtree.node.SimpleNode;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 public class KDTreeTest
 {
@@ -220,6 +223,18 @@ public class KDTreeTest
 		return nearest;
 	}
 
+	
+	@Test
+	public void testKDTreeKNearestNeighborSearch()
+	{
+		assertTrue( testKNearestNeighbor( 3, 3, 1000, 100, -5, 5 ) );		
+	}
+	
+	@Test
+	public void testKDTreeNearestNeighborSearch()
+	{
+		assertTrue( testNearestNeighbor( 3, 1000, 100, -5, 5 ) );		
+	}
 	
 	public static void main( String[] args )
 	{
