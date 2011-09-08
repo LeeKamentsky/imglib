@@ -18,12 +18,12 @@ import net.imglib2.img.Img;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayCursor;
 import net.imglib2.img.array.ArrayImg;
-import net.imglib2.img.basictypeaccess.ByteAccess;
 import net.imglib2.img.basictypeaccess.array.ByteArray;
 import net.imglib2.img.cell.CellCursor;
 import net.imglib2.img.cell.CellImg;
 import net.imglib2.img.cell.CellImgFactory;
 import net.imglib2.img.imageplus.ByteImagePlus;
+import net.imglib2.img.imageplus.ImagePlusImgFactory;
 import net.imglib2.img.planar.PlanarCursor;
 import net.imglib2.img.planar.PlanarImg;
 import net.imglib2.img.planar.PlanarImgFactory;
@@ -381,10 +381,18 @@ public class ImglibBenchmark {
 	}
 
 	private ByteImagePlus<UnsignedByteType> createImagePlusImage(final ImageProcessor ip) {
-		if ( ip == null )
+		if ( ip != null )
+		{
+			final ImagePlus imp = new ImagePlus("image", ip);
+			return ImagePlusAdapter.wrapByte(imp);
+		}
+		if ( (long) imageSize * ( long ) imageSize > Integer.MAX_VALUE )
 			return null;
-		final ImagePlus imp = new ImagePlus("image", ip);
-		return ImagePlusAdapter.wrapByte(imp);
+		long[] dims = new long[ numDimensions ];
+		for ( int d = 0; d < numDimensions; ++d )
+			dims[d] = imageSize;
+		ByteImagePlus<UnsignedByteType> imagePlusContainer = ( ByteImagePlus<UnsignedByteType> ) createImage( dims, new ImagePlusImgFactory< UnsignedByteType >() );
+		return imagePlusContainer;		
 	}
 
 	private Img< UnsignedByteType > createImage(final long[] dims, final ImgFactory< UnsignedByteType > cf )
@@ -437,7 +445,6 @@ public class ImglibBenchmark {
 
 	/** Explicit cell version. */
 	private void invertCellImage(final CellImg<UnsignedByteType, ByteArray> img) {
-		@SuppressWarnings( "unchecked" )
 		final CellCursor< UnsignedByteType, ByteArray > c = img.cursor();
 		while ( c.hasNext() ) {
 			final UnsignedByteType t = c.next();
@@ -510,7 +517,6 @@ public class ImglibBenchmark {
 
 	/** Explicit cell version. */
 	private void randomizeCellImage(final CellImg<UnsignedByteType, ByteArray> img) {
-		@SuppressWarnings( "unchecked" )
 		final CellCursor< UnsignedByteType, ByteArray > c = img.cursor();
 		while ( c.hasNext() ) {
 			final UnsignedByteType t = c.next();
