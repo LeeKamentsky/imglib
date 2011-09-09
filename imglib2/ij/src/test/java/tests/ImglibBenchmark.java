@@ -375,8 +375,19 @@ public class ImglibBenchmark {
 		long[] dims = new long[ numDimensions ];
 		for ( int d = 0; d < numDimensions; ++d )
 			dims[d] = imageSize;
+		UnsignedByteType type = new UnsignedByteType();
+		int cellSize = ( int ) Math.pow( Integer.MAX_VALUE / type.getEntitiesPerPixel(), 1.0 / numDimensions );
+		
+		// test whether there were rounding errors and cellSize is actually too big
+		long t = 1;
+		for ( int d = 0; d < numDimensions; ++d )
+			t *= cellSize;
+		t *= type.getEntitiesPerPixel();
+		if ( t > Integer.MAX_VALUE )
+			throw new RuntimeException( "there were rounding errors and cellSize is actually too big" );
+		
 		@SuppressWarnings( "unchecked" )
-		CellImg<UnsignedByteType, ByteArray> cellContainer = ( CellImg<UnsignedByteType, ByteArray> ) createImage( dims, new CellImgFactory< UnsignedByteType >() );
+		CellImg<UnsignedByteType, ByteArray> cellContainer = ( CellImg<UnsignedByteType, ByteArray> ) createImage( dims, new CellImgFactory< UnsignedByteType >( cellSize ) );
 		return cellContainer;
 	}
 
