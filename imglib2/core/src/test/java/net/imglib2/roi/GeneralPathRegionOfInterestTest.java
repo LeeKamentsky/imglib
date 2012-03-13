@@ -66,24 +66,18 @@ public class GeneralPathRegionOfInterestTest {
 		IterableInterval<BitType> interval = roi.getIterableIntervalOverROI(randomAccessible);
 		Cursor<BitType> cursor = interval.localizingCursor();
 
-final double radius2 = radius /* + 0.5 */;
-final double x2 = x0 - 0.5;
-final double y2 = y0 - 0.5;
-		int y = (int)Math.ceil(y2 - radius);
-		int x = (int)Math.ceil(x2 - Math.sqrt(radius2 * radius2 - (y - y2) * (y - y2)));
-System.err.println("distance: " + getDistance(x, y, x2, y2) + ", " + getDistance(x - 1, y, x2, y2) + ", " + getDistance(94, y, x2, y2) + ", " + getDistance(91, y, x2, y2) + ": " + getDistance(110, 71, x2, y2) + ", " + getDistance(84.0, 73.0, x2, y2));
+		int y = (int)Math.ceil(y0 - radius);
+		int x = (int)Math.ceil(x0 - Math.sqrt(radius * radius - (y - y0) * (y - y0)));
 
 		// For AWT, we are pretty lenient about boundary pixels...
 		double[] coords = new double[2];
 		while (cursor.hasNext()) {
 			cursor.fwd();
 			cursor.localize(coords);
-System.err.println("(" + x + ", " + y + ") (" + coords[0] + ", " + coords[1] + ") : " + getDistance(x, y, x2, y2) + " vs " + getDistance(coords[0], coords[1], x2, y2) + " < " + radius2 + " (<" + radius + ")");
 			if (Math.abs(x - coords[0]) > 1e-10 || Math.abs(y - coords[1]) > 1e-10) {
 				assertTrue("< 1", Math.abs(y - coords[1]) <= 1 + 1e-10);
-System.err.println("dist of " + x + ", " + y + ": " + getDistance(x, y, x2, y2) + " > " + (radius2 - 0.1) + "? " + (getDistance(x, y, x2, y2) > radius2 - 0.2));
 				y++;
-				x = (int)Math.ceil(x0 - Math.sqrt(radius2 * radius2 - (y - y2) * (y - y2)));
+				x = (int)Math.ceil(x0 - Math.sqrt(radius * radius - (y - y0) * (y - y0)));
 				if (Math.abs(x - coords[0]) <= 1 + 1e-10) {
 					x = (int)Math.round(coords[0]);
 				}
