@@ -29,7 +29,7 @@ public class GeneralPathRegionOfInterest extends
 	private long[] stripes; // for efficiency, these are { xStart, xEnd, y } triplets
 	private int index;
 
-	protected GeneralPathRegionOfInterest() {
+	public GeneralPathRegionOfInterest() {
 		super(2);
 		path = new GeneralPath();
 	}
