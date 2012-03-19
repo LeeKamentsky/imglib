@@ -77,9 +77,8 @@ public class GeneralPathRegionOfInterest extends
 
 	// TODO: use an Interval
 	public void iteratePath(final GeneralPathSegmentHandler handler) {
-		final PathIterator iterator = path.getPathIterator(null);
 		final double[] coords = new double[6];
-		for (;;) {
+		for (final PathIterator iterator = path.getPathIterator(null); !iterator.isDone(); iterator.next()) {
 			int type = iterator.currentSegment(coords);
 			switch (type) {
 				case PathIterator.SEG_MOVETO:
