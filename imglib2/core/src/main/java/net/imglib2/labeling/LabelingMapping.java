@@ -13,12 +13,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  * @author Lee Kamentsky
+ * @modifier Christian Dietz, Martin Horn
  *
  */
 package net.imglib2.labeling;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,272 +29,321 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.imglib2.type.numeric.IntegerType;
+
 /**
- * The LabelingMapping maps a set of labelings of a pixel to an index
- * value which can be more compactly stored than the set of labelings.
- * The service it provides is an "intern" function that supplies a
- * canonical object for each set of labelings in a container.
+ * The LabelingMapping maps a set of labelings of a pixel to an index value
+ * which can be more compactly stored than the set of labelings. The service it
+ * provides is an "intern" function that supplies a canonical object for each
+ * set of labelings in a container.
  * 
- * For example, say pixels are labeled with strings and a particular
- * pixel is labeled as belonging to both "Foo" and "Bar" and this
- * is the first label assigned to the container. The caller will ask
- * for the index of { "Foo", "Bar" } and get back the number, "1".
- * LabelingMapping will work faster if the caller first interns
- * { "Foo", "Bar" } and then requests the mapping of the returned object.
- *  
- * @param <T>
+ * For example, say pixels are labeled with strings and a particular pixel is
+ * labeled as belonging to both "Foo" and "Bar" and this is the first label
+ * assigned to the container. The caller will ask for the index of { "Foo",
+ * "Bar" } and get back the number, "1". LabelingMapping will work faster if the
+ * caller first interns { "Foo", "Bar" } and then requests the mapping of the
+ * returned object.
+ * 
+ * @param <L>
  * @param <N>
  */
-public class LabelingMapping<T extends Comparable<T>, N extends Number> {
-	Constructor<N> constructor;
-	N instance;
-	final List<T> theEmptyList;
-	
-	@SuppressWarnings("unchecked")
-	public LabelingMapping(N srcInstance) {
-		instance = srcInstance;
-		Class<? extends Number> c = srcInstance.getClass();
-		try {
-			constructor = (Constructor<N>) c.getConstructor(new Class [] { String.class });
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			throw new AssertionError(e.getMessage());
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			throw new AssertionError("Number class cannot be constructed from a string");
-		}
-		List<T> background = Collections.emptyList(); 
-		theEmptyList = intern(background);
-	}
-	private static class InternedList<T1 extends Comparable<T1>, N extends Number> implements List<T1>
+public class LabelingMapping< L extends Comparable< L >>
+{
+	final List< L > theEmptyList;
+
+	private int maxNumLabels;
+
+	public LabelingMapping( IntegerType< ? > value )
 	{
-		private final List<T1> value;
-		final N index;
-		final LabelingMapping<T1,N> owner;
-		public InternedList(List<T1> src, N index, LabelingMapping<T1,N> owner) {
-			value = Collections.unmodifiableList(src);
-			this.index = index;
+		maxNumLabels = ( int ) value.getMaxValue();
+
+		List< L > background = Collections.emptyList();
+		theEmptyList = intern( background );
+	}
+
+	private static class InternedList< L1 extends Comparable< L1 >> implements List< L1 >
+	{
+		private final List< L1 > value;
+
+		final int index;
+
+		final LabelingMapping< L1 > owner;
+
+		// final LabelingMapping<L1> owner;
+
+		public InternedList( List< L1 > src, int index, LabelingMapping< L1 > owner )
+		{
 			this.owner = owner;
+			this.value = Collections.unmodifiableList( src );
+			this.index = index;
 		}
 
 		@Override
-		public int size() {
+		public int size()
+		{
 			return value.size();
 		}
 
 		@Override
-		public boolean isEmpty() {
+		public boolean isEmpty()
+		{
 			return value.isEmpty();
 		}
 
 		@Override
-		public boolean contains(Object o) {
-			return value.contains(o);
+		public boolean contains( Object o )
+		{
+			return value.contains( o );
 		}
 
 		@Override
-		public Iterator<T1> iterator() {
+		public Iterator< L1 > iterator()
+		{
 			return value.iterator();
 		}
 
 		@Override
-		public Object[] toArray() {
+		public Object[] toArray()
+		{
 			return value.toArray();
 		}
 
 		@Override
-		public boolean add(T1 e) {
-			return value.add(e);
+		public boolean add( L1 e )
+		{
+			return value.add( e );
 		}
 
 		@Override
-		public boolean remove(Object o) {
-			return value.remove(o);
+		public boolean remove( Object o )
+		{
+			return value.remove( o );
 		}
 
 		@Override
-		public boolean containsAll(Collection<?> c) {
-			return value.containsAll(c);
+		public boolean containsAll( Collection< ? > c )
+		{
+			return value.containsAll( c );
 		}
 
 		@Override
-		public boolean addAll(Collection<? extends T1> c) {
-			return value.addAll(c);
+		public boolean addAll( Collection< ? extends L1 > c )
+		{
+			return value.addAll( c );
 		}
 
 		@Override
-		public boolean addAll(int i, Collection<? extends T1> c) {
-			return value.addAll(i, c);
+		public boolean addAll( int index, Collection< ? extends L1 > c )
+		{
+			return value.addAll( index, c );
 		}
 
 		@Override
-		public boolean removeAll(Collection<?> c) {
-			return value.removeAll(c);
+		public boolean removeAll( Collection< ? > c )
+		{
+			return value.removeAll( c );
 		}
 
 		@Override
-		public boolean retainAll(Collection<?> c) {
-			return value.retainAll(c);
+		public boolean retainAll( Collection< ? > c )
+		{
+			return value.retainAll( c );
 		}
 
 		@Override
-		public void clear() {
+		public void clear()
+		{
 			value.clear();
 		}
 
 		@Override
-		public T1 get(int i) {
-			return value.get(i);
+		public L1 get( int index )
+		{
+			return value.get( index );
 		}
 
 		@Override
-		public T1 set(int index, T1 element) {
-			return value.set(index, element);
+		public L1 set( int index, L1 element )
+		{
+			return value.set( index, element );
 		}
 
 		@Override
-		public void add(int i, T1 element) {
-			value.add(i, element);
+		public void add( int index, L1 element )
+		{
+			value.add( index, element );
 		}
 
 		@Override
-		public T1 remove(int i) {
-			return value.remove(i);
+		public L1 remove( int index )
+		{
+			return value.remove( index );
 		}
 
 		@Override
-		public int indexOf(Object o) {
-			return value.indexOf(o);
+		public int indexOf( Object o )
+		{
+			return value.indexOf( o );
 		}
 
 		@Override
-		public int lastIndexOf(Object o) {
-			return value.lastIndexOf(o);
+		public int lastIndexOf( Object o )
+		{
+			return value.lastIndexOf( o );
 		}
 
 		@Override
-		public ListIterator<T1> listIterator() {
+		public ListIterator< L1 > listIterator()
+		{
 			return value.listIterator();
 		}
 
 		@Override
-		public ListIterator<T1> listIterator(int i) {
-			return value.listIterator(i);
+		public ListIterator< L1 > listIterator( int index )
+		{
+			return value.listIterator( index );
 		}
 
 		@Override
-		public List<T1> subList(int fromIndex, int toIndex) {
-			return value.subList(fromIndex, toIndex);
+		public List< L1 > subList( int fromIndex, int toIndex )
+		{
+			return value.subList( fromIndex, toIndex );
 		}
 
 		@Override
-		public <T> T[] toArray(T[] a) {
-			return value.toArray(a);
+		public < T > T[] toArray( T[] a )
+		{
+			return value.toArray( a );
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Object#hashCode()
 		 */
 		@Override
-		public int hashCode() {
+		public int hashCode()
+		{
 			return value.hashCode();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
 		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof InternedList) {
-				@SuppressWarnings("rawtypes")
-				InternedList iobj = (InternedList)obj;
-				return value.equals(iobj.value);
+		public boolean equals( Object obj )
+		{
+			if ( obj instanceof InternedList )
+			{
+				@SuppressWarnings( "rawtypes" )
+				InternedList iobj = ( InternedList ) obj;
+				return value.equals( iobj.value );
 			}
-			return value.equals(obj);
+			return value.equals( obj );
 		}
 	}
 
-	protected Map<List<T>, InternedList<T, N>> internedLists = 
-		new HashMap<List<T>, InternedList<T, N>>();
-	protected ArrayList<InternedList<T,N>> listsByIndex = 
-		new ArrayList<InternedList<T, N>>();
-	
-	public List<T> emptyList() {
+	protected Map< List< L >, InternedList< L >> internedLists = new HashMap< List< L >, InternedList< L >>();
+
+	protected List< InternedList< L >> listsByIndex = new ArrayList< InternedList< L >>();
+
+	public List< L > emptyList()
+	{
 		return theEmptyList;
 	}
+
 	/**
 	 * Return the canonical list for the given list
 	 * 
 	 * @param src
 	 * @return
 	 */
-	public List<T> intern(List<T> src) {
-		return internImpl(src);
+	public List< L > intern( List< L > src )
+	{
+		return internImpl( src );
 	}
-	
-	@SuppressWarnings("unchecked")
-	private InternedList<T,N> internImpl(List<T> src) {
-		InternedList<T,N> interned;
-		if (src instanceof InternedList) {
-			interned = (InternedList<T,N>)src;
-			if (interned.owner == this)
-				return interned;
+
+	private InternedList< L > internImpl( List< L > src )
+	{
+
+		InternedList< L > interned;
+
+		if ( src instanceof InternedList )
+		{
+			interned = ( InternedList< L > ) src;
+			if ( interned.owner == this ) { return interned; }
 		}
-		List<T> copy = new ArrayList<T>(src);
-		Collections.sort(copy);
-		interned = internedLists.get(copy);
-		if (interned == null) {
+		else
+		{
+			List< L > copy = new ArrayList< L >( src );
+			Collections.sort( copy );
+			src = copy;
+		}
+
+		interned = internedLists.get( src );
+
+		if ( interned == null )
+		{
 			int intIndex = listsByIndex.size();
-			N index;
-			try {
-				index = constructor.newInstance(Integer.toString(intIndex));
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				throw new AssertionError(e.getMessage());
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-				throw new AssertionError(e.getMessage());
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-				throw new AssertionError(e.getMessage());
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-				if (e.getTargetException() instanceof NumberFormatException) {
-					throw new AssertionError(String.format("Too many labels (or types of multiply-labeled pixels): %d maximum", intIndex));
-				}
-				throw new AssertionError(e.getMessage());
-			}
-			interned = new InternedList<T, N>(copy, index, this);
-			listsByIndex.add(interned);
-			internedLists.put(interned, interned);
+
+			if ( intIndex >= maxNumLabels )
+				throw new AssertionError( String.format( "Too many labels (or types of multiply-labeled pixels): %d maximum", intIndex ) );
+
+			interned = new InternedList< L >( src, intIndex, this );
+			listsByIndex.add( interned );
+			internedLists.put( src, interned );
+
 		}
+
 		return interned;
 	}
 
-	public List<T> intern(T [] src) {
-		return intern(Arrays.asList(src));
+	public List< L > intern( L[] src )
+	{
+		return intern( Arrays.asList( src ) );
 	}
-	public N indexOf(List<T> key) {
-		InternedList<T,N> interned = internImpl(key); 
+
+	public int indexOf( List< L > key )
+	{
+		InternedList< L > interned = internImpl( key );
 		return interned.index;
 	}
-	public N indexOf(T [] key) {
-		return indexOf(intern(key));
+
+	public int indexOf( L[] key )
+	{
+		return indexOf( intern( key ) );
 	}
-	
-	public List<T> listAtIndex(int index) {
-		return listsByIndex.get(index);
+
+	public final List< L > listAtIndex( int index )
+	{
+		return listsByIndex.get( index );
 	}
+
+	/**
+	 * Returns the number of indexed labeling lists
+	 * 
+	 * @return
+	 */
+	public int numLists()
+	{
+		return listsByIndex.size();
+	}
+
 	/**
 	 * @return the labels defined in the mapping.
 	 */
-	public List<T> getLabels() {
-		HashSet<T> result = new HashSet<T>();
-		for (InternedList<T,N> inst: listsByIndex) {
-			for (T label: inst) {
-				result.add(label);
+	public List< L > getLabels()
+	{
+		HashSet< L > result = new HashSet< L >();
+		for ( InternedList< L > instance : listsByIndex )
+		{
+			for ( L label : instance )
+			{
+				result.add( label );
 			}
 		}
-		return new ArrayList<T>(result);
+		return new ArrayList< L >( result );
 	}
 }
