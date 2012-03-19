@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -22,7 +23,7 @@ import java.awt.image.WritableRaster;
  * @author Johannes Schindelin
  */
 public class GeneralPathRegionOfInterest extends
-	AbstractIterableRegionOfInterest
+	AbstractIterableRegionOfInterest implements GeneralPathSegmentHandler
 {
 
 	private GeneralPath path;
@@ -34,12 +35,74 @@ public class GeneralPathRegionOfInterest extends
 		path = new GeneralPath();
 	}
 
+	@Override
+	public void moveTo(double x, double y) {
+		path.moveTo(x, y);
+	}
+
+	@Override
+	public void lineTo(double x, double y) {
+		path.lineTo(x, y);
+	}
+
+	@Override
+	public void quadTo(double x1, double y1, double x, double y) {
+		path.quadTo(x1, y1, x, y);
+	}
+
+	@Override
+	public void cubicTo(double x1, double y1, double x2, double y2, double x, double y) {
+		path.curveTo(x1, y1, x2, y2, x, y);
+	}
+
+	@Override
+	public void close() {
+		path.closePath();
+	}
+
+	public void reset() {
+		path.reset();
+	}
+
 	// TODO: remove
 	public void setGeneralPath(final GeneralPath path) {
 		this.path = path;
 		this.stripes = null;
 	}
+	
+	// TODO: remove
+	public GeneralPath getGeneralPath() {
+		return path;
+	}
 
+	// TODO: use an Interval
+	public void iteratePath(final GeneralPathSegmentHandler handler) {
+		final PathIterator iterator = path.getPathIterator(null);
+		final double[] coords = new double[6];
+		for (;;) {
+			int type = iterator.currentSegment(coords);
+			switch (type) {
+				case PathIterator.SEG_MOVETO:
+					handler.moveTo(coords[0], coords[1]);
+					break;
+				case PathIterator.SEG_LINETO:
+					handler.lineTo(coords[0], coords[1]);
+					break;
+				case PathIterator.SEG_QUADTO:
+					handler.quadTo(coords[0], coords[1], coords[2], coords[3]);
+					break;
+				case PathIterator.SEG_CUBICTO:
+					handler.cubicTo(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
+					break;
+				case PathIterator.SEG_CLOSE:
+					handler.close();
+					break;
+				default:
+					throw new RuntimeException("Unsupported segment type: " + type);
+			}
+		}
+	}
+	
 	@Override
 	protected boolean nextRaster(long[] position, long[] end) {
 		ensureStripes();
