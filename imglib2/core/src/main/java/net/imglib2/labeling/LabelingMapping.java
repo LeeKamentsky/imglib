@@ -44,12 +44,12 @@ import net.imglib2.type.numeric.IntegerType;
  * caller first interns { "Foo", "Bar" } and then requests the mapping of the
  * returned object.
  *
- * @param <L>
+ * @param <T>
  * @param <N>
  */
-public class LabelingMapping< L extends Comparable< L >>
+public class LabelingMapping< T extends Comparable< T >>
 {
-	final List< L > theEmptyList;
+	final List< T > theEmptyList;
 
 	private final int maxNumLabels;
 
@@ -57,21 +57,21 @@ public class LabelingMapping< L extends Comparable< L >>
 	{
 		maxNumLabels = ( int ) value.getMaxValue();
 
-		final List< L > background = Collections.emptyList();
+		final List< T > background = Collections.emptyList();
 		theEmptyList = intern( background );
 	}
 
-	private static class InternedList< L1 extends Comparable< L1 >> implements List< L1 >
+	private static class InternedList< T1 extends Comparable< T1 >> implements List< T1 >
 	{
-		private final List< L1 > value;
+		private final List< T1 > value;
 
 		final int index;
 
-		final LabelingMapping< L1 > owner;
+		final LabelingMapping< T1 > owner;
 
 		// final LabelingMapping<L1> owner;
 
-		public InternedList( final List< L1 > src, final int index, final LabelingMapping< L1 > owner )
+		public InternedList( final List< T1 > src, final int index, final LabelingMapping< T1 > owner )
 		{
 			this.owner = owner;
 			this.value = Collections.unmodifiableList( src );
@@ -97,7 +97,7 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 
 		@Override
-		public Iterator< L1 > iterator()
+		public Iterator< T1 > iterator()
 		{
 			return value.iterator();
 		}
@@ -109,7 +109,7 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 
 		@Override
-		public boolean add( final L1 e )
+		public boolean add( final T1 e )
 		{
 			return value.add( e );
 		}
@@ -127,13 +127,13 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 
 		@Override
-		public boolean addAll( final Collection< ? extends L1 > c )
+		public boolean addAll( final Collection< ? extends T1 > c )
 		{
 			return value.addAll( c );
 		}
 
 		@Override
-		public boolean addAll( final int index, final Collection< ? extends L1 > c )
+		public boolean addAll( final int index, final Collection< ? extends T1 > c )
 		{
 			return value.addAll( index, c );
 		}
@@ -157,25 +157,25 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 
 		@Override
-		public L1 get( final int index )
+		public T1 get( final int index )
 		{
 			return value.get( index );
 		}
 
 		@Override
-		public L1 set( final int index, final L1 element )
+		public T1 set( final int index, final T1 element )
 		{
 			return value.set( index, element );
 		}
 
 		@Override
-		public void add( final int index, final L1 element )
+		public void add( final int index, final T1 element )
 		{
 			value.add( index, element );
 		}
 
 		@Override
-		public L1 remove( final int index )
+		public T1 remove( final int index )
 		{
 			return value.remove( index );
 		}
@@ -193,19 +193,19 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 
 		@Override
-		public ListIterator< L1 > listIterator()
+		public ListIterator< T1 > listIterator()
 		{
 			return value.listIterator();
 		}
 
 		@Override
-		public ListIterator< L1 > listIterator( final int index )
+		public ListIterator< T1 > listIterator( final int index )
 		{
 			return value.listIterator( index );
 		}
 
 		@Override
-		public List< L1 > subList( final int fromIndex, final int toIndex )
+		public List< T1 > subList( final int fromIndex, final int toIndex )
 		{
 			return value.subList( fromIndex, toIndex );
 		}
@@ -246,11 +246,11 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 	}
 
-	protected Map< List< L >, InternedList< L >> internedLists = new HashMap< List< L >, InternedList< L >>();
+	protected Map< List< T >, InternedList< T >> internedLists = new HashMap< List< T >, InternedList< T >>();
 
-	protected List< InternedList< L >> listsByIndex = new ArrayList< InternedList< L >>();
+	protected List< InternedList< T >> listsByIndex = new ArrayList< InternedList< T >>();
 
-	public List< L > emptyList()
+	public List< T > emptyList()
 	{
 		return theEmptyList;
 	}
@@ -261,24 +261,24 @@ public class LabelingMapping< L extends Comparable< L >>
 	 * @param src
 	 * @return
 	 */
-	public List< L > intern( final List< L > src )
+	public List< T > intern( final List< T > src )
 	{
 		return internImpl( src );
 	}
 
-	private InternedList< L > internImpl( List< L > src )
+	private InternedList< T > internImpl( List< T > src )
 	{
 
-		InternedList< L > interned;
+		InternedList< T > interned;
 
 		if ( src instanceof InternedList )
 		{
-			interned = ( InternedList< L > ) src;
+			interned = ( InternedList< T > ) src;
 			if ( interned.owner == this ) { return interned; }
 		}
 		else
 		{
-			final List< L > copy = new ArrayList< L >( src );
+			final List< T > copy = new ArrayList< T >( src );
 			Collections.sort( copy );
 			src = copy;
 		}
@@ -292,7 +292,7 @@ public class LabelingMapping< L extends Comparable< L >>
 			if ( intIndex >= maxNumLabels )
 				throw new AssertionError( String.format( "Too many labels (or types of multiply-labeled pixels): %d maximum", intIndex ) );
 
-			interned = new InternedList< L >( src, intIndex, this );
+			interned = new InternedList< T >( src, intIndex, this );
 			listsByIndex.add( interned );
 			internedLists.put( src, interned );
 
@@ -301,23 +301,23 @@ public class LabelingMapping< L extends Comparable< L >>
 		return interned;
 	}
 
-	public List< L > intern( final L[] src )
+	public List< T > intern( final T[] src )
 	{
 		return intern( Arrays.asList( src ) );
 	}
 
-	public int indexOf( final List< L > key )
+	public int indexOf( final List< T > key )
 	{
-		final InternedList< L > interned = internImpl( key );
+		final InternedList< T > interned = internImpl( key );
 		return interned.index;
 	}
 
-	public int indexOf( final L[] key )
+	public int indexOf( final T[] key )
 	{
 		return indexOf( intern( key ) );
 	}
 
-	public final List< L > listAtIndex( final int index )
+	public final List< T > listAtIndex( final int index )
 	{
 		return listsByIndex.get( index );
 	}
@@ -335,16 +335,16 @@ public class LabelingMapping< L extends Comparable< L >>
 	/**
 	 * @return the labels defined in the mapping.
 	 */
-	public List< L > getLabels()
+	public List< T > getLabels()
 	{
-		final HashSet< L > result = new HashSet< L >();
-		for ( final InternedList< L > instance : listsByIndex )
+		final HashSet< T > result = new HashSet< T >();
+		for ( final InternedList< T > instance : listsByIndex )
 		{
-			for ( final L label : instance )
+			for ( final T label : instance )
 			{
 				result.add( label );
 			}
 		}
-		return new ArrayList< L >( result );
+		return new ArrayList< T >( result );
 	}
 }

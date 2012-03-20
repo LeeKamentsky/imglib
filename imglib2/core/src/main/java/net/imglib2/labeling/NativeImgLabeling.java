@@ -38,19 +38,19 @@ import net.imglib2.type.numeric.IntegerType;
  *
  * @author leek
  *
- * @param <L>
+ * @param <T>
  *            the type of labels assigned to pixels
  */
-public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType< T >> extends AbstractNativeLabeling< L >
+public class NativeImgLabeling< T extends Comparable< T >, I extends IntegerType< I >> extends AbstractNativeLabeling< T >
 {
 
 	protected final long[] generation;
 
-	protected final Img< T > img;
+	protected final Img< I > img;
 
-	public NativeImgLabeling( final Img< T > img )
+	public NativeImgLabeling( final Img< I > img )
 	{
-		super( dimensions( img ), new DefaultROIStrategyFactory< L >(), new LabelingMapping< L >( img.firstElement().createVariable() ) );
+		super( dimensions( img ), new DefaultROIStrategyFactory< T >(), new LabelingMapping< T >( img.firstElement().createVariable() ) );
 		this.img = img;
 		this.generation = new long[ 1 ];
 	}
@@ -73,19 +73,19 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	 * @param imgFactory
 	 *            - the image factory to generate the native image
 	 */
-	public NativeImgLabeling( final LabelingROIStrategyFactory< L > strategyFactory, final Img< T > img )
+	public NativeImgLabeling( final LabelingROIStrategyFactory< T > strategyFactory, final Img< I > img )
 	{
-		super( dimensions( img ), strategyFactory, new LabelingMapping< L >( img.firstElement().createVariable() ) );
+		super( dimensions( img ), strategyFactory, new LabelingMapping< T >( img.firstElement().createVariable() ) );
 		this.img = img;
 		this.generation = new long[ 1 ];
 	}
 
 	@Override
-	public RandomAccess< LabelingType< L >> randomAccess()
+	public RandomAccess< LabelingType< T >> randomAccess()
 	{
-		final RandomAccess< T > rndAccess = img.randomAccess();
+		final RandomAccess< I > rndAccess = img.randomAccess();
 
-		return new ConvertedRandomAccess< T, LabelingType< L >>( new LabelingTypeSamplerConverter( rndAccess ), rndAccess );
+		return new ConvertedRandomAccess< I, LabelingType< T >>( new LabelingTypeSamplerConverter( rndAccess ), rndAccess );
 	}
 
 	/*
@@ -96,31 +96,31 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	 * .labeling.LabelingType)
 	 */
 	@Override
-	public Cursor< LabelingType< L >> cursor()
+	public Cursor< LabelingType< T >> cursor()
 	{
 
-		final Cursor< T > cursor = img.cursor();
-		return new ConvertedCursor< T, LabelingType< L >>( new LabelingTypeSamplerConverter( cursor ), cursor );
+		final Cursor< I > cursor = img.cursor();
+		return new ConvertedCursor< I, LabelingType< T >>( new LabelingTypeSamplerConverter( cursor ), cursor );
 	}
 
 	@Override
-	public Cursor< LabelingType< L >> localizingCursor()
+	public Cursor< LabelingType< T >> localizingCursor()
 	{
-		final Cursor< T > cursor = img.localizingCursor();
-		return new ConvertedCursor< T, LabelingType< L >>( new LabelingTypeSamplerConverter( cursor ), cursor );
+		final Cursor< I > cursor = img.localizingCursor();
+		return new ConvertedCursor< I, LabelingType< T >>( new LabelingTypeSamplerConverter( cursor ), cursor );
 	}
 
-	public Img< T > getStorageImg()
+	public Img< I > getStorageImg()
 	{
 		return img;
 	}
 
 	@Override
-	public Labeling< L > copy()
+	public Labeling< T > copy()
 	{
-		final NativeImgLabeling< L, T > result = new NativeImgLabeling< L, T >( img.factory().create( img, img.firstElement().createVariable() ) );
-		final Cursor< LabelingType< L >> srcCursor = cursor();
-		final Cursor< LabelingType< L >> resCursor = result.cursor();
+		final NativeImgLabeling< T, I > result = new NativeImgLabeling< T, I >( img.factory().create( img, img.firstElement().createVariable() ) );
+		final Cursor< LabelingType< T >> srcCursor = cursor();
+		final Cursor< LabelingType< T >> resCursor = result.cursor();
 
 		while ( srcCursor.hasNext() )
 		{
@@ -134,18 +134,18 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 
 	}
 
-	class LabelingTypeSamplerConverter implements SamplerConverter< T, LabelingType< L >>
+	class LabelingTypeSamplerConverter implements SamplerConverter< I, LabelingType< T >>
 	{
 
-		private final LabelingType< L > type;
+		private final LabelingType< T > type;
 
-		public LabelingTypeSamplerConverter( final Sampler< T > source )
+		public LabelingTypeSamplerConverter( final Sampler< I > source )
 		{
-			this.type = new LabelingType< L >( source.get(), mapping, generation );
+			this.type = new LabelingType< T >( source.get(), mapping, generation );
 		}
 
 		@Override
-		public LabelingType< L > convert( final Sampler< T > sampler )
+		public LabelingType< T > convert( final Sampler< I > sampler )
 		{
 			return type;
 		}
@@ -159,19 +159,19 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	}
 
 	@Override
-	public LabelingType< L > firstElement()
+	public LabelingType< T > firstElement()
 	{
 		return cursor().next();
 	}
 
 	@Override
-	public Iterator< LabelingType< L >> iterator()
+	public Iterator< LabelingType< T >> iterator()
 	{
 		return cursor();
 	}
 
 	@Override
-	public RandomAccess< LabelingType< L >> randomAccess( final Interval interval )
+	public RandomAccess< LabelingType< T >> randomAccess( final Interval interval )
 	{
 		return randomAccess();
 	}
@@ -185,7 +185,7 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 			@Override
 			public Labeling< LL > create( final long[] dim )
 			{
-				return new NativeImgLabeling< LL, T >( img.factory().create( dim, img.firstElement().createVariable() ) );
+				return new NativeImgLabeling< LL, I >( img.factory().create( dim, img.firstElement().createVariable() ) );
 			}
 
 		};

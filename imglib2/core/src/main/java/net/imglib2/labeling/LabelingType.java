@@ -30,15 +30,15 @@ import net.imglib2.type.numeric.integer.IntType;
  * The LabelingType represents a labeling of a pixel with zero or more labelings
  * of type T. Each labeling names a distinct object in the image space.
  *
- * @param <L>
+ * @param <T>
  *            the desired type of the pixel labels, for instance Integer to
  *            number objects or String for user-assigned label names
  */
-public class LabelingType< L extends Comparable< L >> implements Type< LabelingType< L >>
+public class LabelingType< T extends Comparable< T >> implements Type< LabelingType< T >>
 {
 	final protected long[] generation;
 
-	protected final LabelingMapping< L > mapping;
+	protected final LabelingMapping< T > mapping;
 
 	protected final IntegerType< ? > type;
 
@@ -49,7 +49,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	 * @param mapping
 	 * @param generation
 	 */
-	protected LabelingType( final IntegerType< ? > type, final LabelingMapping< L > mapping, final long[] generation )
+	protected LabelingType( final IntegerType< ? > type, final LabelingMapping< T > mapping, final long[] generation )
 	{
 		this.type = type;
 		this.mapping = mapping;
@@ -57,7 +57,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	}
 
 	// this is the constructor if you want it to read from an array
-	public LabelingType( final IntegerType< ? > type, final LabelingMapping< L > mapping )
+	public LabelingType( final IntegerType< ? > type, final LabelingMapping< T > mapping )
 	{
 		this.type = type;
 		this.mapping = mapping;
@@ -65,10 +65,10 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	}
 
 	// this is the constructor if you want it to be a variable
-	public LabelingType( final List< L > value )
+	public LabelingType( final List< T > value )
 	{
 
-		mapping = new LabelingMapping< L >( new IntType() );
+		mapping = new LabelingMapping< T >( new IntType() );
 		generation = new long[ 1 ];
 
 		this.type = new IntType();
@@ -76,7 +76,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public LabelingType( final L value )
+	public LabelingType( final T value )
 	{
 		this( Arrays.asList( value ) );
 	}
@@ -84,7 +84,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	// this is the constructor if you want it to be a variable
 	public LabelingType()
 	{
-		this( new ArrayList< L >() );
+		this( new ArrayList< T >() );
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	 *
 	 * @return a list of the labelings at the current location.
 	 */
-	public final List< L > getLabeling()
+	public final List< T > getLabeling()
 	{
 		return mapping.listAtIndex( type.getInteger() );
 	}
@@ -102,7 +102,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	 *
 	 * @param labeling
 	 */
-	public void setLabeling( final List< L > labeling )
+	public void setLabeling( final List< T > labeling )
 	{
 		this.type.setInteger( mapping.indexOf( labeling ) );
 		synchronized ( generation )
@@ -111,7 +111,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 		}
 	}
 
-	public void setLabeling( final L[] labeling )
+	public void setLabeling( final T[] labeling )
 	{
 		setLabeling( Arrays.asList( labeling ) );
 	}
@@ -122,9 +122,9 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	 * @param label
 	 *            - the label to assign
 	 */
-	public void setLabel( final L label )
+	public void setLabel( final T label )
 	{
-		final List< L > labeling = new ArrayList< L >( 1 );
+		final List< T > labeling = new ArrayList< T >( 1 );
 		labeling.add( label );
 		setLabeling( labeling );
 	}
@@ -137,7 +137,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	 * @param labeling
 	 * @return
 	 */
-	public List< L > intern( final List< L > labeling )
+	public List< T > intern( final List< T > labeling )
 	{
 		return mapping.intern( labeling );
 	}
@@ -150,9 +150,9 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	 *            - a label for a pixel.
 	 * @return - the canonical labeling with the single label.
 	 */
-	public List< L > intern( final L label )
+	public List< T > intern( final T label )
 	{
-		final List< L > labeling = new ArrayList< L >( 1 );
+		final List< T > labeling = new ArrayList< T >( 1 );
 		labeling.add( label );
 		return intern( labeling );
 	}
@@ -163,19 +163,19 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	// }
 
 	@Override
-	public LabelingType< L > createVariable()
+	public LabelingType< T > createVariable()
 	{
-		return new LabelingType< L >();
+		return new LabelingType< T >();
 	}
 
 	@Override
-	public LabelingType< L > copy()
+	public LabelingType< T > copy()
 	{
-		return new LabelingType< L >( getLabeling() );
+		return new LabelingType< T >( getLabeling() );
 	}
 
 	@Override
-	public void set( final LabelingType< L > c )
+	public void set( final LabelingType< T > c )
 	{
 		setLabeling( c.getLabeling() );
 	}
@@ -191,7 +191,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	 *
 	 * @return a list of all labels in the type's associated storage
 	 */
-	List< L > getLabels()
+	List< T > getLabels()
 	{
 		return mapping.getLabels();
 	}
@@ -210,7 +210,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 		return generation[ 0 ];
 	}
 
-	public LabelingMapping< L > getMapping()
+	public LabelingMapping< T > getMapping()
 	{
 		return mapping;
 	}

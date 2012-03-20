@@ -22,17 +22,17 @@ package net.imglib2.labeling;
 import net.imglib2.Interval;
 import net.imglib2.util.Util;
 
-public abstract class LabelingFactory< LL extends Comparable< LL >>
+public abstract class LabelingFactory< T extends Comparable< T >>
 {
 
-	public abstract Labeling< LL > create( final long[] dim );
+	public abstract Labeling< T > create( final long[] dim );
 
-	public Labeling< LL > create( final int[] dim )
+	public Labeling< T > create( final int[] dim )
 	{
 		return create( Util.int2long( dim ) );
 	}
 
-	public Labeling< LL > create( final Interval interval )
+	public Labeling< T > create( final Interval interval )
 	{
 		final long[] dim = new long[ interval.numDimensions() ];
 		interval.dimensions( dim );

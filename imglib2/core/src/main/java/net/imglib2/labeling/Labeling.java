@@ -32,7 +32,7 @@ import net.imglib2.roi.RegionOfInterest;
  *         labeled objects in addition to image-like methods to discover the
  *         labels at given pixels.
  */
-public interface Labeling< L extends Comparable< L >> extends RandomAccessibleInterval< LabelingType< L >>, IterableInterval< LabelingType< L >>
+public interface Labeling< T extends Comparable< T >> extends RandomAccessibleInterval< LabelingType< T >>, IterableInterval< LabelingType< T >>
 {
 	/**
 	 * find the coordinates of the bounding box around the given label. The the
@@ -44,7 +44,7 @@ public interface Labeling< L extends Comparable< L >> extends RandomAccessibleIn
 	 *            - find pixels with this label
 	 * @return true if some pixels are labeled, false if none have the label
 	 */
-	public boolean getExtents( L label, long[] minExtents, long[] maxExtents );
+	public boolean getExtents( T label, long[] minExtents, long[] maxExtents );
 
 	/**
 	 * Find the first pixel in a raster scan of the object with the given label.
@@ -53,7 +53,7 @@ public interface Labeling< L extends Comparable< L >> extends RandomAccessibleIn
 	 * @param start
 	 * @return
 	 */
-	public boolean getRasterStart( L label, long[] start );
+	public boolean getRasterStart( T label, long[] start );
 
 	/**
 	 * Return the area or suitable N-d analog of the labeled object
@@ -62,14 +62,14 @@ public interface Labeling< L extends Comparable< L >> extends RandomAccessibleIn
 	 *            - label for object in question
 	 * @return area in units of pixel / voxel / etc.
 	 */
-	public long getArea( L label );
+	public long getArea( T label );
 
 	/**
 	 * Find all labels in the space
 	 *
 	 * @return a collection of the labels.
 	 */
-	public Collection< L > getLabels();
+	public Collection< T > getLabels();
 
 	/**
 	 * Get a region of interest optimized to determine point membership
@@ -78,7 +78,7 @@ public interface Labeling< L extends Comparable< L >> extends RandomAccessibleIn
 	 *            The ROI will represent the area labeled with this label
 	 * @return a region of interest
 	 */
-	public RegionOfInterest getRegionOfInterest( L label );
+	public RegionOfInterest getRegionOfInterest( T label );
 
 	/**
 	 * Get a ROI that represents the pixels with the given label
@@ -86,14 +86,14 @@ public interface Labeling< L extends Comparable< L >> extends RandomAccessibleIn
 	 * @param label
 	 * @return
 	 */
-	public IterableRegionOfInterest getIterableRegionOfInterest( L label );
+	public IterableRegionOfInterest getIterableRegionOfInterest( T label );
 
 	/**
 	 * Copy method
 	 *
 	 * @return copy of the labeling
 	 */
-	public Labeling< L > copy();
+	public Labeling< T > copy();
 
 	/**
 	 * Factory
