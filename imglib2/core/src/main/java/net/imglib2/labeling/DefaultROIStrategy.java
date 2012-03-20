@@ -11,7 +11,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  * @author Lee Kamentsky
  *
  */
@@ -31,9 +31,9 @@ import net.imglib2.roi.RegionOfInterest;
 /**
  * A relatively conservative strategy suitable for blobby objects - retain the
  * bounding boxes and raster starts and reconstruct the cursors by scanning.
- * 
+ *
  * @author leek
- * 
+ *
  * @param <T>
  *            - the type used to label the space
  * @param <L>
@@ -49,18 +49,18 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 
 	private class LabelStatistics extends BoundingBox
 	{
-		private long[] rasterStart;
+		private final long[] rasterStart;
 
 		private long area = 0;
 
-		public LabelStatistics( int dimensions )
+		public LabelStatistics( final int dimensions )
 		{
 			super( dimensions );
 			rasterStart = new long[ dimensions ];
 			Arrays.fill( rasterStart, Integer.MAX_VALUE );
 		}
 
-		public void getRasterStart( long[] start )
+		public void getRasterStart( final long[] start )
 		{
 			System.arraycopy( rasterStart, 0, start, 0, rasterStart.length );
 		}
@@ -70,7 +70,8 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 			return area;
 		}
 
-		public void update( long[] position )
+		@Override
+		public void update( final long[] position )
 		{
 			super.update( position );
 			area++;
@@ -88,7 +89,7 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 
 	protected Map< T, LabelStatistics > statistics;
 
-	public DefaultROIStrategy( L labeling )
+	public DefaultROIStrategy( final L labeling )
 	{
 		this.labeling = labeling;
 		generation = Long.MIN_VALUE;
@@ -103,16 +104,16 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 		if ( ( type == null ) || ( type.getGeneration() != generation ) )
 		{
 			statistics = new HashMap< T, LabelStatistics >();
-			long[] position = new long[ labeling.numDimensions() ];
+			final long[] position = new long[ labeling.numDimensions() ];
 			LabelStatistics last = null;
 			T lastLabel = null;
-			Cursor< LabelingType< T >> c = labeling.localizingCursor();
+			final Cursor< LabelingType< T >> c = labeling.localizingCursor();
 			while ( c.hasNext() )
 			{
 				type = c.next();
 				c.localize( position );
 
-				for ( T label : type.getLabeling() )
+				for ( final T label : type.getLabeling() )
 				{
 					if ( ( last == null ) || ( !label.equals( lastLabel ) ) )
 					{
@@ -133,10 +134,10 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 	}
 
 	@Override
-	public boolean getExtents( T label, long[] minExtents, long[] maxExtents )
+	public boolean getExtents( final T label, final long[] minExtents, final long[] maxExtents )
 	{
 		computeStatistics();
-		LabelStatistics stats = statistics.get( label );
+		final LabelStatistics stats = statistics.get( label );
 		if ( stats == null )
 		{
 			if ( minExtents != null )
@@ -150,10 +151,10 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 	}
 
 	@Override
-	public boolean getRasterStart( T label, long[] start )
+	public boolean getRasterStart( final T label, final long[] start )
 	{
 		computeStatistics();
-		LabelStatistics stats = statistics.get( label );
+		final LabelStatistics stats = statistics.get( label );
 		if ( stats == null )
 		{
 			Arrays.fill( start, 0 );
@@ -164,10 +165,10 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 	}
 
 	@Override
-	public long getArea( T label )
+	public long getArea( final T label )
 	{
 		computeStatistics();
-		LabelStatistics stats = statistics.get( label );
+		final LabelStatistics stats = statistics.get( label );
 		if ( stats == null ) { return 0; }
 		return stats.getArea();
 	}
@@ -181,15 +182,15 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 
 	/**
 	 * Implement a region of interest by linking to the statistics.
-	 * 
+	 *
 	 * @author leek
-	 * 
+	 *
 	 */
 	class DefaultRegionOfInterest extends AbstractIterableRegionOfInterest
 	{
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see net.imglib2.roi.AbstractIterableRegionOfInterest#size()
 		 */
 		T label;
@@ -208,7 +209,7 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 
 		final double[] real_max;
 
-		DefaultRegionOfInterest( T label )
+		DefaultRegionOfInterest( final T label )
 		{
 			super( labeling.numDimensions() );
 			this.label = label;
@@ -238,7 +239,7 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 		}
 
 		@Override
-		protected boolean isMember( double[] position )
+		protected boolean isMember( final double[] position )
 		{
 			for ( int i = 0; i < position.length; i++ )
 			{
@@ -248,14 +249,14 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 		}
 
 		@Override
-		protected void getExtrema( long[] minima, long[] maxima )
+		protected void getExtrema( final long[] minima, final long[] maxima )
 		{
 			System.arraycopy( min, 0, minima, 0, numDimensions() );
 			System.arraycopy( max, 0, maxima, 0, numDimensions() );
 		}
 
 		@Override
-		protected boolean nextRaster( long[] position, long[] end )
+		protected boolean nextRaster( final long[] position, final long[] end )
 		{
 			for ( int i = numDimensions() - 1; i >= 0; i-- )
 			{
@@ -300,13 +301,13 @@ public class DefaultROIStrategy< T extends Comparable< T >, L extends Labeling< 
 	}
 
 	@Override
-	public RegionOfInterest createRegionOfInterest( T label )
+	public RegionOfInterest createRegionOfInterest( final T label )
 	{
 		return new DefaultRegionOfInterest( label );
 	}
 
 	@Override
-	public IterableRegionOfInterest createIterableRegionOfInterest( T label )
+	public IterableRegionOfInterest createIterableRegionOfInterest( final T label )
 	{
 		return new DefaultRegionOfInterest( label );
 	}

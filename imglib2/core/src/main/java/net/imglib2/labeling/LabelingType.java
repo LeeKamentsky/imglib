@@ -11,7 +11,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  * @author Lee Kamentsky
  * @modified Christian Dietz, Martin Horn
  *
@@ -29,7 +29,7 @@ import net.imglib2.type.numeric.integer.IntType;
 /**
  * The LabelingType represents a labeling of a pixel with zero or more labelings
  * of type T. Each labeling names a distinct object in the image space.
- * 
+ *
  * @param <L>
  *            the desired type of the pixel labels, for instance Integer to
  *            number objects or String for user-assigned label names
@@ -44,12 +44,12 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 
 	/**
 	 * Constructor for mirroring state with another labeling
-	 * 
+	 *
 	 * @param storage
 	 * @param mapping
 	 * @param generation
 	 */
-	protected LabelingType( IntegerType< ? > type, LabelingMapping< L > mapping, long[] generation )
+	protected LabelingType( final IntegerType< ? > type, final LabelingMapping< L > mapping, final long[] generation )
 	{
 		this.type = type;
 		this.mapping = mapping;
@@ -57,7 +57,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	}
 
 	// this is the constructor if you want it to read from an array
-	public LabelingType( IntegerType< ? > type, LabelingMapping< L > mapping )
+	public LabelingType( final IntegerType< ? > type, final LabelingMapping< L > mapping )
 	{
 		this.type = type;
 		this.mapping = mapping;
@@ -65,7 +65,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	}
 
 	// this is the constructor if you want it to be a variable
-	public LabelingType( List< L > value )
+	public LabelingType( final List< L > value )
 	{
 
 		mapping = new LabelingMapping< L >( new IntType() );
@@ -76,7 +76,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public LabelingType( L value )
+	public LabelingType( final L value )
 	{
 		this( Arrays.asList( value ) );
 	}
@@ -89,7 +89,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 
 	/**
 	 * Get the labels defined at the type's current pixel or
-	 * 
+	 *
 	 * @return a list of the labelings at the current location.
 	 */
 	public final List< L > getLabeling()
@@ -99,10 +99,10 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 
 	/**
 	 * Set the labeling at the current pixel
-	 * 
+	 *
 	 * @param labeling
 	 */
-	public void setLabeling( List< L > labeling )
+	public void setLabeling( final List< L > labeling )
 	{
 		this.type.setInteger( mapping.indexOf( labeling ) );
 		synchronized ( generation )
@@ -111,20 +111,20 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 		}
 	}
 
-	public void setLabeling( L[] labeling )
+	public void setLabeling( final L[] labeling )
 	{
 		setLabeling( Arrays.asList( labeling ) );
 	}
 
 	/**
 	 * Assign a pixel a single label
-	 * 
+	 *
 	 * @param label
 	 *            - the label to assign
 	 */
-	public void setLabel( L label )
+	public void setLabel( final L label )
 	{
-		List< L > labeling = new ArrayList< L >( 1 );
+		final List< L > labeling = new ArrayList< L >( 1 );
 		labeling.add( label );
 		setLabeling( labeling );
 	}
@@ -133,11 +133,11 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	 * This method returns the canonical object for the given labeling.
 	 * SetLabeling will work faster if you pass it the interned object instead
 	 * of one created by you.
-	 * 
+	 *
 	 * @param labeling
 	 * @return
 	 */
-	public List< L > intern( List< L > labeling )
+	public List< L > intern( final List< L > labeling )
 	{
 		return mapping.intern( labeling );
 	}
@@ -145,14 +145,14 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	/**
 	 * Return the canonical labeling object representing the single labeling.
 	 * SetLabeling will work faster if you use this object.
-	 * 
+	 *
 	 * @param label
 	 *            - a label for a pixel.
 	 * @return - the canonical labeling with the single label.
 	 */
-	public List< L > intern( L label )
+	public List< L > intern( final L label )
 	{
-		List< L > labeling = new ArrayList< L >( 1 );
+		final List< L > labeling = new ArrayList< L >( 1 );
 		labeling.add( label );
 		return intern( labeling );
 	}
@@ -175,7 +175,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	}
 
 	@Override
-	public void set( LabelingType< L > c )
+	public void set( final LabelingType< L > c )
 	{
 		setLabeling( c.getLabeling() );
 	}
@@ -188,7 +188,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 
 	/**
 	 * Get the labels known by the type
-	 * 
+	 *
 	 * @return a list of all labels in the type's associated storage
 	 */
 	List< L > getLabels()
@@ -202,7 +202,7 @@ public class LabelingType< L extends Comparable< L >> implements Type< LabelingT
 	 * or necessary to know whether the storage has changed to know when the
 	 * cache is invalid. The strategy is to save the generation number at the
 	 * time of cacheing and invalidate the cache if the number doesn't match.
-	 * 
+	 *
 	 * @return the generation of the underlying storage
 	 */
 	long getGeneration()

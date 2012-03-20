@@ -11,7 +11,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  * @author Lee Kamentsky
  * @modified Christian Dietz, Martin Horn
  *
@@ -35,9 +35,9 @@ import net.imglib2.type.numeric.IntegerType;
 /**
  * A labeling backed by a native image that takes a labeling type backed by an
  * int array.
- * 
+ *
  * @author leek
- * 
+ *
  * @param <L>
  *            the type of labels assigned to pixels
  */
@@ -48,16 +48,16 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 
 	protected final Img< T > img;
 
-	public NativeImgLabeling( Img< T > img )
+	public NativeImgLabeling( final Img< T > img )
 	{
 		super( dimensions( img ), new DefaultROIStrategyFactory< L >(), new LabelingMapping< L >( img.firstElement().createVariable() ) );
 		this.img = img;
 		this.generation = new long[ 1 ];
 	}
 
-	private static long[] dimensions( Interval i )
+	private static long[] dimensions( final Interval i )
 	{
-		long[] dims = new long[ i.numDimensions() ];
+		final long[] dims = new long[ i.numDimensions() ];
 		i.dimensions( dims );
 		return dims;
 	}
@@ -65,7 +65,7 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	/**
 	 * Create a labeling backed by a native image with custom strategy and image
 	 * factory
-	 * 
+	 *
 	 * @param dim
 	 *            - dimensions of the labeling
 	 * @param strategyFactory
@@ -73,7 +73,7 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	 * @param imgFactory
 	 *            - the image factory to generate the native image
 	 */
-	public NativeImgLabeling( LabelingROIStrategyFactory< L > strategyFactory, Img< T > img )
+	public NativeImgLabeling( final LabelingROIStrategyFactory< L > strategyFactory, final Img< T > img )
 	{
 		super( dimensions( img ), strategyFactory, new LabelingMapping< L >( img.firstElement().createVariable() ) );
 		this.img = img;
@@ -83,14 +83,14 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	@Override
 	public RandomAccess< LabelingType< L >> randomAccess()
 	{
-		RandomAccess< T > rndAccess = img.randomAccess();
+		final RandomAccess< T > rndAccess = img.randomAccess();
 
 		return new ConvertedRandomAccess< T, LabelingType< L >>( new LabelingTypeSamplerConverter( rndAccess ), rndAccess );
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * net.imglib2.labeling.AbstractNativeLabeling#setLinkedType(net.imglib2
 	 * .labeling.LabelingType)
@@ -99,14 +99,14 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	public Cursor< LabelingType< L >> cursor()
 	{
 
-		Cursor< T > cursor = img.cursor();
+		final Cursor< T > cursor = img.cursor();
 		return new ConvertedCursor< T, LabelingType< L >>( new LabelingTypeSamplerConverter( cursor ), cursor );
 	}
 
 	@Override
 	public Cursor< LabelingType< L >> localizingCursor()
 	{
-		Cursor< T > cursor = img.localizingCursor();
+		final Cursor< T > cursor = img.localizingCursor();
 		return new ConvertedCursor< T, LabelingType< L >>( new LabelingTypeSamplerConverter( cursor ), cursor );
 	}
 
@@ -137,15 +137,15 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	class LabelingTypeSamplerConverter implements SamplerConverter< T, LabelingType< L >>
 	{
 
-		private LabelingType< L > type;
+		private final LabelingType< L > type;
 
-		public LabelingTypeSamplerConverter( Sampler< T > source )
+		public LabelingTypeSamplerConverter( final Sampler< T > source )
 		{
 			this.type = new LabelingType< L >( source.get(), mapping, generation );
 		}
 
 		@Override
-		public LabelingType< L > convert( Sampler< T > sampler )
+		public LabelingType< L > convert( final Sampler< T > sampler )
 		{
 			return type;
 		}
@@ -153,7 +153,7 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	}
 
 	@Override
-	public boolean equalIterationOrder( IterableRealInterval< ? > f )
+	public boolean equalIterationOrder( final IterableRealInterval< ? > f )
 	{
 		return false;
 	}
@@ -171,7 +171,7 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 	}
 
 	@Override
-	public RandomAccess< LabelingType< L >> randomAccess( Interval interval )
+	public RandomAccess< LabelingType< L >> randomAccess( final Interval interval )
 	{
 		return randomAccess();
 	}
@@ -183,7 +183,7 @@ public class NativeImgLabeling< L extends Comparable< L >, T extends IntegerType
 		{
 
 			@Override
-			public Labeling< LL > create( long[] dim )
+			public Labeling< LL > create( final long[] dim )
 			{
 				return new NativeImgLabeling< LL, T >( img.factory().create( dim, img.firstElement().createVariable() ) );
 			}

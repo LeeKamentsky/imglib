@@ -11,7 +11,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  * @author Lee Kamentsky
  * @modifier Christian Dietz, Martin Horn
  *
@@ -36,14 +36,14 @@ import net.imglib2.type.numeric.IntegerType;
  * which can be more compactly stored than the set of labelings. The service it
  * provides is an "intern" function that supplies a canonical object for each
  * set of labelings in a container.
- * 
+ *
  * For example, say pixels are labeled with strings and a particular pixel is
  * labeled as belonging to both "Foo" and "Bar" and this is the first label
  * assigned to the container. The caller will ask for the index of { "Foo",
  * "Bar" } and get back the number, "1". LabelingMapping will work faster if the
  * caller first interns { "Foo", "Bar" } and then requests the mapping of the
  * returned object.
- * 
+ *
  * @param <L>
  * @param <N>
  */
@@ -51,13 +51,13 @@ public class LabelingMapping< L extends Comparable< L >>
 {
 	final List< L > theEmptyList;
 
-	private int maxNumLabels;
+	private final int maxNumLabels;
 
-	public LabelingMapping( IntegerType< ? > value )
+	public LabelingMapping( final IntegerType< ? > value )
 	{
 		maxNumLabels = ( int ) value.getMaxValue();
 
-		List< L > background = Collections.emptyList();
+		final List< L > background = Collections.emptyList();
 		theEmptyList = intern( background );
 	}
 
@@ -71,7 +71,7 @@ public class LabelingMapping< L extends Comparable< L >>
 
 		// final LabelingMapping<L1> owner;
 
-		public InternedList( List< L1 > src, int index, LabelingMapping< L1 > owner )
+		public InternedList( final List< L1 > src, final int index, final LabelingMapping< L1 > owner )
 		{
 			this.owner = owner;
 			this.value = Collections.unmodifiableList( src );
@@ -91,7 +91,7 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 
 		@Override
-		public boolean contains( Object o )
+		public boolean contains( final Object o )
 		{
 			return value.contains( o );
 		}
@@ -109,43 +109,43 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 
 		@Override
-		public boolean add( L1 e )
+		public boolean add( final L1 e )
 		{
 			return value.add( e );
 		}
 
 		@Override
-		public boolean remove( Object o )
+		public boolean remove( final Object o )
 		{
 			return value.remove( o );
 		}
 
 		@Override
-		public boolean containsAll( Collection< ? > c )
+		public boolean containsAll( final Collection< ? > c )
 		{
 			return value.containsAll( c );
 		}
 
 		@Override
-		public boolean addAll( Collection< ? extends L1 > c )
+		public boolean addAll( final Collection< ? extends L1 > c )
 		{
 			return value.addAll( c );
 		}
 
 		@Override
-		public boolean addAll( int index, Collection< ? extends L1 > c )
+		public boolean addAll( final int index, final Collection< ? extends L1 > c )
 		{
 			return value.addAll( index, c );
 		}
 
 		@Override
-		public boolean removeAll( Collection< ? > c )
+		public boolean removeAll( final Collection< ? > c )
 		{
 			return value.removeAll( c );
 		}
 
 		@Override
-		public boolean retainAll( Collection< ? > c )
+		public boolean retainAll( final Collection< ? > c )
 		{
 			return value.retainAll( c );
 		}
@@ -157,37 +157,37 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 
 		@Override
-		public L1 get( int index )
+		public L1 get( final int index )
 		{
 			return value.get( index );
 		}
 
 		@Override
-		public L1 set( int index, L1 element )
+		public L1 set( final int index, final L1 element )
 		{
 			return value.set( index, element );
 		}
 
 		@Override
-		public void add( int index, L1 element )
+		public void add( final int index, final L1 element )
 		{
 			value.add( index, element );
 		}
 
 		@Override
-		public L1 remove( int index )
+		public L1 remove( final int index )
 		{
 			return value.remove( index );
 		}
 
 		@Override
-		public int indexOf( Object o )
+		public int indexOf( final Object o )
 		{
 			return value.indexOf( o );
 		}
 
 		@Override
-		public int lastIndexOf( Object o )
+		public int lastIndexOf( final Object o )
 		{
 			return value.lastIndexOf( o );
 		}
@@ -199,26 +199,26 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 
 		@Override
-		public ListIterator< L1 > listIterator( int index )
+		public ListIterator< L1 > listIterator( final int index )
 		{
 			return value.listIterator( index );
 		}
 
 		@Override
-		public List< L1 > subList( int fromIndex, int toIndex )
+		public List< L1 > subList( final int fromIndex, final int toIndex )
 		{
 			return value.subList( fromIndex, toIndex );
 		}
 
 		@Override
-		public < T > T[] toArray( T[] a )
+		public < T > T[] toArray( final T[] a )
 		{
 			return value.toArray( a );
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Object#hashCode()
 		 */
 		@Override
@@ -229,15 +229,16 @@ public class LabelingMapping< L extends Comparable< L >>
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
 		@Override
-		public boolean equals( Object obj )
+		public boolean equals( final Object obj )
 		{
 			if ( obj instanceof InternedList )
 			{
 				@SuppressWarnings( "rawtypes" )
+				final
 				InternedList iobj = ( InternedList ) obj;
 				return value.equals( iobj.value );
 			}
@@ -256,11 +257,11 @@ public class LabelingMapping< L extends Comparable< L >>
 
 	/**
 	 * Return the canonical list for the given list
-	 * 
+	 *
 	 * @param src
 	 * @return
 	 */
-	public List< L > intern( List< L > src )
+	public List< L > intern( final List< L > src )
 	{
 		return internImpl( src );
 	}
@@ -277,7 +278,7 @@ public class LabelingMapping< L extends Comparable< L >>
 		}
 		else
 		{
-			List< L > copy = new ArrayList< L >( src );
+			final List< L > copy = new ArrayList< L >( src );
 			Collections.sort( copy );
 			src = copy;
 		}
@@ -286,7 +287,7 @@ public class LabelingMapping< L extends Comparable< L >>
 
 		if ( interned == null )
 		{
-			int intIndex = listsByIndex.size();
+			final int intIndex = listsByIndex.size();
 
 			if ( intIndex >= maxNumLabels )
 				throw new AssertionError( String.format( "Too many labels (or types of multiply-labeled pixels): %d maximum", intIndex ) );
@@ -300,30 +301,30 @@ public class LabelingMapping< L extends Comparable< L >>
 		return interned;
 	}
 
-	public List< L > intern( L[] src )
+	public List< L > intern( final L[] src )
 	{
 		return intern( Arrays.asList( src ) );
 	}
 
-	public int indexOf( List< L > key )
+	public int indexOf( final List< L > key )
 	{
-		InternedList< L > interned = internImpl( key );
+		final InternedList< L > interned = internImpl( key );
 		return interned.index;
 	}
 
-	public int indexOf( L[] key )
+	public int indexOf( final L[] key )
 	{
 		return indexOf( intern( key ) );
 	}
 
-	public final List< L > listAtIndex( int index )
+	public final List< L > listAtIndex( final int index )
 	{
 		return listsByIndex.get( index );
 	}
 
 	/**
 	 * Returns the number of indexed labeling lists
-	 * 
+	 *
 	 * @return
 	 */
 	public int numLists()
@@ -336,10 +337,10 @@ public class LabelingMapping< L extends Comparable< L >>
 	 */
 	public List< L > getLabels()
 	{
-		HashSet< L > result = new HashSet< L >();
-		for ( InternedList< L > instance : listsByIndex )
+		final HashSet< L > result = new HashSet< L >();
+		for ( final InternedList< L > instance : listsByIndex )
 		{
-			for ( L label : instance )
+			for ( final L label : instance )
 			{
 				result.add( label );
 			}
