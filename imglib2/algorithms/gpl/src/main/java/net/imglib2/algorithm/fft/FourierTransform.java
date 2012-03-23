@@ -262,7 +262,16 @@ public class FourierTransform<T extends RealType<T>, S extends ComplexType<S>> i
 	public boolean process() 
 	{		
 		final long startTime = System.currentTimeMillis();
-
+		
+		System.out.println( "input" );
+		System.out.println( Util.printCoordinates( input ) );
+		System.out.println( "imageExtension" );
+		System.out.println( Util.printCoordinates( imageExtension ) );
+		System.out.println( "getExtendedImageSize" );
+		System.out.println( Util.printCoordinates( getExtendedImageSize( input, imageExtension ) ) );
+		System.out.println( "extendedZeroPaddedSize" );
+		System.out.println( Util.printCoordinates( getZeroPaddingSize( getExtendedImageSize( input, imageExtension ), fftOptimization ) ) );
+		
 		//
 		// perform FFT on the temporary image
 		//			
@@ -322,7 +331,10 @@ public class FourierTransform<T extends RealType<T>, S extends ComplexType<S>> i
 			
 			originalOffset[ d ] = ( extendedZeroPaddedSize[ d ] - (int)input.dimension( d ) ) / 2;			
 		}
-		
+
+		System.out.println( "originaloffset" );
+		System.out.println( Util.printCoordinates( originalOffset ) );
+
 		
 		fftImage = FFTFunctions.computeFFT( input, imgFactory, complexType, outOfBoundsFactory, originalOffset, extendedZeroPaddedSize, getNumThreads(), false );
 		

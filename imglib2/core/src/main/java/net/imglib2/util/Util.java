@@ -644,6 +644,33 @@ public class Util
 		return out;
 	}
 
+	public static String printCoordinates( final Interval interval )
+	{
+		String out = "(interval null)";
+
+		if ( interval == null )
+			return out;
+		else
+			out = "min(" + interval.min( 0 );
+
+		for ( int i = 1; i < interval.numDimensions(); i++ )
+			out += ", " + interval.min( i );
+
+		out += "), max(" + interval.max( 0 );
+
+		for ( int i = 1; i < interval.numDimensions(); i++ )
+			out += ", " + interval.max( i );
+
+		out += "), size(" + interval.dimension( 0 );
+
+		for ( int i = 1; i < interval.numDimensions(); i++ )
+			out += ", " + interval.dimension( i );
+
+		out += ")";
+
+		return out;
+	}
+
 	public static String printCoordinates( final double[] value )
 	{
 		String out = "(Array empty)";

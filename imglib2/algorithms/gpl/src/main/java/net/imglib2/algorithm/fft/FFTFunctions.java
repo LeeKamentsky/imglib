@@ -27,12 +27,19 @@ import net.imglib2.RandomAccessible;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.ImgFactory;
+import net.imglib2.img.array.ArrayImgFactory;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.iterator.LocalizingZeroMinIntervalIterator;
 import net.imglib2.multithreading.SimpleMultiThreading;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
+import net.imglib2.outofbounds.OutOfBoundsMirrorFactory;
+import net.imglib2.outofbounds.OutOfBoundsMirrorSingleBoundary;
+import net.imglib2.outofbounds.OutOfBoundsMirrorFactory.Boundary;
+import net.imglib2.outofbounds.OutOfBoundsPeriodicFactory;
 import net.imglib2.type.Type;
 import net.imglib2.type.numeric.ComplexType;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 import edu.mines.jtk.dsp.FftComplex;
@@ -368,18 +375,30 @@ A:						while( cursorDim.hasNext() )
 		return realImage;
 	}
 	
+	static int num = 1;
+	
 	final public static <T extends RealType<T>, S extends ComplexType<S>> Img<S> 
 						computeFFT( final RandomAccessibleInterval<T> input,
 						            final ImgFactory<S> imgFactory,
 						            final S complexType, 
-						            final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory,
+						            OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory,
 						            final int[] imageOffset, final int[] imageSize,
 						            final int numThreads, final boolean scale )
 	{
 		final int numDimensions = input.numDimensions();
 		
-		// create ExtendedRandomAccess for input using the OutOfBoundsStrategy
+		// create ExtendedRandomAccess for input using the OutOfBoundsStrategy		
+		//outOfBoundsFactory = new OutOfBoundsMirrorFactory<T, RandomAccessibleInterval<T>>( Boundary.SINGLE );
+		
 		final RandomAccessible< T > extendedInput = Views.extend( input, outOfBoundsFactory );
+		
+		ImageJFunctions.show( input, "for FFT " + num );
+		
+		System.out.println( "imageOffset " + Util.printCoordinates( imageOffset) );
+		System.out.println( "imageSize " + Util.printCoordinates( imageSize) );
+		
+		final Img< FloatType > tmpI = new ArrayImgFactory< FloatType >().create( imageSize, new FloatType() );
+		final RandomAccess< FloatType> tmpRA = tmpI.randomAccess();
 		
 		final int complexSize[] = new int[ numDimensions ];
 		
@@ -404,7 +423,7 @@ A:						while( cursorDim.hasNext() )
 				public void run()
 				{
 					final int myNumber = ai.getAndIncrement();
-					
+								
 					final int realSize = imageSize[ 0 ];
 					final int complexSize = (int)fftImage.dimension( 0 );
 							
@@ -442,11 +461,14 @@ A:						while( cursorDim.hasNext() )
 
 								tmp[ 0 ] = 0;
 								tmp2[ 0 ] = -imageOffset[ 0 ] + (int)input.min( 0 );
+								tmpRA.setPosition( 0, 0 );
 								
 								for ( int d = 1; d < numDimensions; ++d )
 								{
 									tmp[ d ] = fakeSize[ d - 1 ];
 									tmp2[ d ] = fakeSize[ d - 1 ] - imageOffset[ d ] + (int)input.min( d );
+									
+									tmpRA.setPosition( fakeSize[ d - 1 ], d );
 								}
 
 								// set the cursor to the beginning of the correct line
@@ -457,6 +479,9 @@ A:						while( cursorDim.hasNext() )
 								{
 									tempIn[ x ] = cursor.get().getRealFloat();									
 									cursor.fwd( 0 );
+									
+									tmpRA.get().set( cursor.get().getRealFloat() );
+									tmpRA.fwd( 0 );
 								}
 								tempIn[ (realSize-1) ] = cursor.get().getRealFloat();
 
@@ -487,6 +512,9 @@ A:						while( cursorDim.hasNext() )
 								}
 							}
 						}
+						
+						ImageJFunctions.show( tmpI, "input for FFT " + num );
+						num++;
 					}
 					else
 					{
